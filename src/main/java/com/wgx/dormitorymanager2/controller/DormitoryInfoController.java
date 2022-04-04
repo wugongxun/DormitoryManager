@@ -1,8 +1,10 @@
 package com.wgx.dormitorymanager2.controller;
 
 import com.wgx.dormitorymanager2.bean.DormitoryInfo;
+import com.wgx.dormitorymanager2.bean.PaymentInfo;
 import com.wgx.dormitorymanager2.bean.ScoreAndLikesInfo;
 import com.wgx.dormitorymanager2.bean.Student;
+import com.wgx.dormitorymanager2.mapper.PaymentInfoMapper;
 import com.wgx.dormitorymanager2.message.Message;
 import com.wgx.dormitorymanager2.service.DormitoryInfoService;
 import com.wgx.dormitorymanager2.service.StudentService;
@@ -32,9 +34,9 @@ import java.util.List;
 @Controller
 public class DormitoryInfoController {
     @Autowired
-    DormitoryInfoService dormitoryInfoService;
+    private DormitoryInfoService dormitoryInfoService;
     @Autowired
-    StudentService studentService;
+    private StudentService studentService;
     @Autowired
     private RedisTemplate redisTemplate;
 

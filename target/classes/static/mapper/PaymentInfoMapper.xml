@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+namespace:名称空间
+id:唯一标识
+resultType:返回值类型
+#{id}:从传递过来的参数中取出id值
+-->
+<mapper namespace="com.wgx.dormitorymanager2.mapper.PaymentInfoMapper">
+
+    <!--将PaymentRecord封装到PaymentInfo的PaymentRecords中-->
+    <resultMap id="paymentInfoResultMap" type="com.wgx.dormitorymanager2.bean.PaymentInfo">
+        <id property="dormitoryId" column="dormitory_id"/>
+        <result property="airConditioningFees" column="air_conditioning_fees"/>
+        <result property="electricityFees" column="electricity_fees"/>
+        <collection property="paymentRecords"
+                    select="com.wgx.dormitorymanager2.mapper.PaymentRecordMapper.queryAllPaymentRecordByDormitoryId"
+                    column="dormitory_id"/>
+    </resultMap>
+
+    <select id="queryPaymentInfoByDormitoryId"
+            resultType="com.wgx.dormitorymanager2.bean.PaymentInfo"
+            resultMap="paymentInfoResultMap">
+        select * from payment_info where dormitory_id = #{dormitoryId}
+    </select>
+</mapper>
