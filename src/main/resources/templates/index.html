@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <link rel="canonical" href="https://getbootstrap.com/docs/3.4/examples/dashboard/">
+
+  <title>首页</title>
+
+  <!-- Bootstrap core CSS -->
+  <link href="https://fastly.jsdelivr.net/npm/@bootcss/v3.bootcss.com@1.0.35/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+  <link href="https://fastly.jsdelivr.net/npm/@bootcss/v3.bootcss.com@1.0.35/assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+
+  <!-- Custom styles for this template -->
+  <link th:href="@{/static/css/index.css}" href="../static/css/index.css" rel="stylesheet">
+
+  <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+  <!--[if lt IE 9]><script src="https://fastly.jsdelivr.net/npm/@bootcss/v3.bootcss.com@1.0.35/assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+  <script src="https://fastly.jsdelivr.net/npm/@bootcss/v3.bootcss.com@1.0.35/assets/js/ie-emulation-modes-warning.js"></script>
+
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!--[if lt IE 9]>
+  <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+  <![endif]-->
+</head>
+
+<body>
+
+<div th:insert="~{top-navbar.html}"></div>
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-3 col-md-2 sidebar">
+      <ul class="nav nav-sidebar">
+        <li><a th:href="@{/}">首页</a></li>
+        <li><a th:href="@{/personalCenter}">个人中心</a></li>
+        <li><a th:href="@{/studentManage}">学生管理</a></li>
+        <li><a th:href="@{/dormitoryManage}">宿舍管理</a></li>
+        <li><a th:href="@{/sanitaryInspection}">卫生检查</a></li>
+        <li><a th:href="@{/paymentInformation}">缴费信息</a></li>
+        <li><a th:href="@{/repairFeedback}">报修反馈</a></li>
+        <li><a th:href="@{/dormitoryAnnouncement}">宿舍公告</a></li>
+      </ul>
+    </div>
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+      <h1 class="page-header">欢迎使用学生宿舍管理系统</h1>
+
+      <div class="row placeholders">
+        <img src="../static/bg.jpg" class="img-responsive" alt="Responsive image">
+      </div>
+
+      <div class="row">
+        <div class="col-md-12">
+          <ul class="nav nav-tabs">
+            <li role="presentation"><a th:href="@{/queryDormitoryAnnouncement}">宿舍公告</a></li>
+            <li role="presentation"><a href="#">学校新闻</a></li>
+            <li role="presentation"><a href="#">校园快讯</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12" th:each="dormitoryAnnouncement : ${dormitoryAnnouncementPage.records}">
+          <h1 class="text-center" th:text="${dormitoryAnnouncement.title}">2022级新生入学报到须知</h1>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12" th:each="dormitoryAnnouncement : ${dormitoryAnnouncementPage.records}">
+          <h4 class="bg-info" th:text="${dormitoryAnnouncement.content}">&nbsp&nbsp在各系报到点领取《宿舍钥匙领取单》，由各系青年志愿者带到宿舍楼栋领取宿舍钥匙，入住宿舍。
+            新同学入学后，教务处统一编制学号，财务处再根据学号、姓名、年级、专业等信息制新生一卡通，制卡完毕后由各班统一领取发放。
+            途中一定要注意人身安全，并保管好随身所带，贵重物品及各种证件已经防丢失。所有费用由学校财务处统一收取，并开具安徽省学校专用收费票据，学校不会委托其他部门或个人代收任何费用。
+            口罩：同学们记得多备点口罩，无论是在校园的路上还是教学楼、食堂等室内都要戴好口罩，并保持安全距离。
+            体温计：在校期间，需要进行早、中、晚体温测量，并坚持每日健康打卡，体温计可以选择传统的水银体温计或者更便捷的电子体温计。
+            来校途中要全程佩戴好口罩，在公共交通工具上尽量减少与其他人员交流，避免聚集，与同乘者尽量保持距离。尽量避免直接触摸门把手、电梯按钮等公共设施，接触后要及时洗手或用速干手消毒剂等擦拭清洁处理。</h4>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12">
+          <nav aria-label="...">
+            <ul class="pager">
+              <th:block th:if="${dormitoryAnnouncementPage.hasPrevious()}">
+                <li class="previous"><a th:href="@{/queryDormitoryAnnouncement(pageNum=${dormitoryAnnouncementPage.current - 1})}"><span aria-hidden="true">&larr;</span> 上一条</a></li>
+              </th:block>
+              <th:block th:if="${dormitoryAnnouncementPage.hasNext()}">
+                <li class="next"><a th:href="@{/queryDormitoryAnnouncement(pageNum=${dormitoryAnnouncementPage.current + 1})}">下一条 <span aria-hidden="true">&rarr;</span></a></li>
+              </th:block>
+            </ul>
+          </nav>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="https://fastly.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>
+<script>window.jQuery || document.write('<script src="https://fastly.jsdelivr.net/npm/@bootcss/v3.bootcss.com@1.0.35/assets/js/vendor/jquery.min.js"><\/script>')</script>
+<script src="https://fastly.jsdelivr.net/npm/@bootcss/v3.bootcss.com@1.0.35/dist/js/bootstrap.min.js"></script>
+<!-- Just to make our placeholder images work. Don't actually copy the next line! -->
+<script src="https://fastly.jsdelivr.net/npm/@bootcss/v3.bootcss.com@1.0.35/assets/js/vendor/holder.min.js"></script>
+<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+<script src="https://fastly.jsdelivr.net/npm/@bootcss/v3.bootcss.com@1.0.35/assets/js/ie10-viewport-bug-workaround.js"></script>
+</body>
+</html>

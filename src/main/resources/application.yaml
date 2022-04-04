@@ -1,0 +1,42 @@
+spring:
+  #数据源配置
+  datasource:
+    url: jdbc:mysql://localhost:3306/dormitory_manager
+    username: root
+    password: wgx
+    driver-class-name: com.mysql.jdbc.Driver
+  #上传文件限制大小
+  servlet:
+    multipart:
+      max-file-size: 4MB
+  #开启RESTFul风格请求
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
+  #redis配置
+  redis:
+    host: 47.100.85.66
+    port: 6379
+    password: w1999g1117x
+    connect-timeout: 15000
+    lettuce:
+      pool:
+        max-active: 8
+        max-wait: 15000
+        max-idle: 10
+        min-idle: 0
+
+#文件上传路径(服务器)
+file:
+  uploadFolder: /home/wgx/dormitoryPhoto/
+
+#mybatis-plus配置
+mybatis-plus:
+  configuration:
+    lazy-loading-enabled: true
+  mapper-locations: classpath:static/mapper/*.xml
+
+#端口修改为80
+server:
+  port: 80

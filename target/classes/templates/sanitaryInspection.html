@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="canonical" href="https://getbootstrap.com/docs/3.4/examples/dashboard/">
+
+    <title>卫生检查</title>
+
+    <!-- jQuery (Bootstrap 的所有 JavaScript 插件都依赖 jQuery，所以必须放在前边) -->
+    <script src="https://fastly.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>
+
+    <!-- Bootstrap core CSS -->
+    <link href="https://fastly.jsdelivr.net/npm/@bootcss/v3.bootcss.com@1.0.35/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="https://fastly.jsdelivr.net/npm/@bootcss/v3.bootcss.com@1.0.35/assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link th:href="@{/static/css/index.css}" href="../static/css/index.css" rel="stylesheet">
+
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="https://fastly.jsdelivr.net/npm/@bootcss/v3.bootcss.com@1.0.35/assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <script src="https://fastly.jsdelivr.net/npm/@bootcss/v3.bootcss.com@1.0.35/assets/js/ie-emulation-modes-warning.js"></script>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <script type="text/javascript">
+
+        $(function(){
+            $(".pic").click(function(){
+                var _this = $(this);//将当前的pimg元素作为_this传入函数
+                imgShow("#outerdiv", "#innerdiv", "#bigimg", _this);
+            });
+
+            /*清空所有点赞*/
+            $("#clearAllLikes").click(function () {
+                if (confirm("确定要删除所有宿舍的点赞数?")) {
+                    $.ajax({
+                        url: "/clearAllLikes",
+                        type: "GET",
+                        success: function (result) {
+                            window.location.reload();
+                        }
+                    });
+                }
+            });
+
+            /*清空单个宿舍点赞*/
+            $(".clearLikes").click(function () {
+                let dormitoryId = $(this).val();
+                $.ajax({
+                    url: "/clearLikes",
+                    data: "dormitoryId=" + dormitoryId,
+                    type: "GET",
+                    success: function (result) {
+                        window.location.reload();
+                    }
+                });
+            });
+
+            /*修改宿舍评分*/
+            $(".changeScore").click(function () {
+                let dormitoryId = $(this).val();
+                let score = $("#" + dormitoryId + "-score").text();
+                $("#" + dormitoryId + "-score").empty();
+                $("<input type='text'>").val(score).attr("id", dormitoryId + "-score-input").appendTo("#" + dormitoryId + "-score");
+                $("#" + dormitoryId + "-score-input").blur(function () {
+                    let inputScore = $(this).val();
+                    let reg = /^[0-9]*$/
+                    if (inputScore > 100 || inputScore < 0 || !(reg.test(inputScore))) {
+                        alert("分数在0-100之间");
+                        return;
+                    }
+                    $.ajax({
+                        url: "/changeScoreByDormitoryId",
+                        data: "inputScore=" + inputScore + "&dormitoryId=" + dormitoryId,
+                        type: "GET",
+                        success: function (result) {
+                            window.location.reload();
+                        }
+                    });
+                });
+            });
+
+            /*点赞*/
+            $(".likesButton").click(function () {
+                let dormitoryId = $(this).val();
+                $.ajax({
+                    url: "/likes",
+                    data: "dormitoryId=" + dormitoryId,
+                    type: "GET",
+                    success: function (result) {
+                        if (result.statusCode == 200) {
+                            alert(result.message);
+                        } else {
+                            if (result.message == "取消点赞") {
+                                $(this).find("span").removeClass("glyphicon glyphicon-heart").removeClass("glyphicon glyphicon-heart-empty");
+                                $(this).find("span").addClass("glyphicon glyphicon-heart-empty");
+                                window.location.reload();
+                            } else if (result.message == "点赞成功") {
+                                $(this).find("span").removeClass("glyphicon glyphicon-heart").removeClass("glyphicon glyphicon-heart-empty");
+                                $(this).find("span").addClass("glyphicon glyphicon-heart");
+                                window.location.reload();
+                            } else {
+                                alert(result.message);
+                            }
+                        }
+                    }
+                });
+            });
+
+        });
+
+        //放大图片JS
+        function imgShow(outerdiv, innerdiv, bigimg, _this){
+            var src = _this.attr("src");//获取当前点击的pimg元素中的src属性
+            $(bigimg).attr("src", src);//设置#bigimg元素的src属性
+            /*获取当前点击图片的真实大小，并显示弹出层及大图*/
+            $("<img/>").attr("src", src).load(function(){
+                var windowW = $(window).width();//获取当前窗口宽度
+                var windowH = $(window).height();//获取当前窗口高度
+                var realWidth = this.width;//获取图片真实宽度
+                var realHeight = this.height;//获取图片真实高度
+                var imgWidth, imgHeight;
+                var scale = 0.8;//缩放尺寸，当图片真实宽度和高度大于窗口宽度和高度时进行缩放
+                if(realHeight>windowH*scale) {//判断图片高度
+                    imgHeight = windowH*scale;//如大于窗口高度，图片高度进行缩放
+                    imgWidth = imgHeight/realHeight*realWidth;//等比例缩放宽度
+                    if(imgWidth>windowW*scale) {//如宽度扔大于窗口宽度
+                        imgWidth = windowW*scale;//再对宽度进行缩放
+                    }
+                } else if(realWidth>windowW*scale) {//如图片高度合适，判断图片宽度
+                    imgWidth = windowW*scale;//如大于窗口宽度，图片宽度进行缩放
+                    imgHeight = imgWidth/realWidth*realHeight;//等比例缩放高度
+                } else {//如果图片真实高度和宽度都符合要求，高宽不变
+                    imgWidth = realWidth;
+                    imgHeight = realHeight;
+                }
+                $(bigimg).css("width",imgWidth);//以最终的宽度对图片缩放
+                var w = (windowW-imgWidth)/2;//计算图片与窗口左边距
+                var h = (windowH-imgHeight)/2;//计算图片与窗口上边距
+                $(innerdiv).css({"top":h, "left":w});//设置#innerdiv的top和left属性
+                $(outerdiv).fadeIn("fast");//淡入显示#outerdiv及.pimg
+            });
+            $(outerdiv).click(function(){//再次点击淡出消失弹出层
+                $(this).fadeOut("fast");
+            });
+        }
+
+    </script>
+
+</head>
+<body>
+
+<!--放大图片-->
+<div id="outerdiv" style="position:fixed;top:0;left:0;background:rgba(0,0,0,0.7);z-index:2;width:100%;height:100%;display:none;">
+    <div id="innerdiv" style="position:absolute;">
+        <img id="bigimg" style="border:5px solid #fff;" src="" />
+    </div>
+</div>
+
+<div th:insert="~{top-navbar.html}"></div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+            <ul class="nav nav-sidebar">
+                <li><a th:href="@{/}">首页</a></li>
+                <li><a th:href="@{/personalCenter}">个人中心</a></li>
+                <li><a th:href="@{/studentManage}">学生管理</a></li>
+                <li><a th:href="@{/dormitoryManage}">宿舍管理</a></li>
+                <li><a th:href="@{/sanitaryInspection}">卫生检查</a></li>
+                <li><a th:href="@{/paymentInformation}">缴费信息</a></li>
+                <li><a th:href="@{/repairFeedback}">报修反馈</a></li>
+                <li><a th:href="@{/dormitoryAnnouncement}">宿舍公告</a></li>
+            </ul>
+        </div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+            <h1 class="page-header">卫生检查</h1>
+
+            <div class="row">
+                <div class="col-md-10">
+                    <form class="form-inline" th:action="@{/queryAllDormitoryByBuildingId}" method="get">
+                        <div class="form-group">
+                            <label for="selectBuilding">宿舍楼</label>
+                            <select class="form-control" id="selectBuilding" name="buildingId">
+                                <option style="display: none;" disabled selected>请选择宿舍楼</option>
+                                <th:block th:each="buildingId : ${buildingIdList}">
+                                    <option th:text="${buildingId}" th:value="${buildingId}"></option>
+                                </th:block>
+<!--                                                                <option value="219">219</option>-->
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-default">查询</button>
+                    </form>
+                </div>
+                <div class="col-md-2" th:if="${session.administrator != null}">
+                    <button class="btn btn-primary" id="clearAllLikes">清空所有点赞</button>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12" th:if="${buildingId == null}">
+                    <h2 class="sub-header">请先选择需要查询的宿舍楼</h2>
+                </div>
+                <div class="col-md-12" th:if="${buildingId != null}">
+                    <h2 class="sub-header" th:text="${buildingId}">请先选择需要查询的宿舍楼</h2>
+                </div>
+            </div>
+
+            <div class="row" th:if="${dormitoryInfos != null}">
+                <div class="col-md-12">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover text-center">
+                            <thead>
+                            <tr>
+                                <th class="text-center">宿舍号</th>
+                                <th class="text-center">照片</th>
+                                <th class="text-center">评分</th>
+                                <th class="text-center">点赞数</th>
+                                <th:block th:if="${session.student != null}">
+                                    <th class="text-center">点赞</th>
+                                </th:block>
+                                <th:block th:if="${session.administrator != null}">
+                                    <th class="text-center">操作</th>
+                                </th:block>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="dormitoryInfo : ${dormitoryInfos}">
+                                <td th:text="${dormitoryInfo.buildingId} + '#' + ${dormitoryInfo.floorId}">219#204</td>
+                                <td th:if="${dormitoryInfo.photoName} != null">
+                                    <img th:src="@{'/static/dormitoryPhoto/' + ${dormitoryInfo.photoName}}" class="img-responsive center-block pic" alt="Responsive image" style="width: 200px;height: 100%;">
+                                </td>
+                                <td th:if="${dormitoryInfo.photoName} == null">
+                                    暂无照片
+                                </td>
+
+                                <td th:text="${dormitoryInfo.scoreAndLikesInfo.score}" th:id="${dormitoryInfo.dormitoryId} + '-score'">90</td>
+
+                                <td th:text="${dormitoryInfo.scoreAndLikesInfo.likes} ">23</td>
+                                <th:block th:if="${session.student != null}">
+                                    <td>
+                                        <button class="btn btn-success likesButton" th:if="${dormitoryInfo.scoreAndLikesInfo.currentIsLike} == true" th:value="${dormitoryInfo.dormitoryId}">点赞<span class="glyphicon glyphicon-heart"></span></button>
+                                        <button class="btn btn-success likesButton" th:if="${dormitoryInfo.scoreAndLikesInfo.currentIsLike} == false" th:value="${dormitoryInfo.dormitoryId}">点赞<span class="glyphicon glyphicon-heart-empty"></span></button>
+                                        <button class="btn btn-danger">举报</button>
+                                    </td>
+                                </th:block>
+                                <th:block th:if="${session.administrator != null}">
+                                    <td>
+                                        <button class="btn btn-info clearLikes" th:value="${dormitoryInfo.dormitoryId}">清空点赞</button>
+                                        <button class="btn btn-info changeScore" th:value="${dormitoryInfo.dormitoryId}">修改评分</button>
+                                    </td>
+                                </th:block>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="https://fastly.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>
+<script>window.jQuery || document.write('<script src="https://fastly.jsdelivr.net/npm/@bootcss/v3.bootcss.com@1.0.35/assets/js/vendor/jquery.min.js"><\/script>')</script>
+<script src="https://fastly.jsdelivr.net/npm/@bootcss/v3.bootcss.com@1.0.35/dist/js/bootstrap.min.js"></script>
+<!-- Just to make our placeholder images work. Don't actually copy the next line! -->
+<script src="https://fastly.jsdelivr.net/npm/@bootcss/v3.bootcss.com@1.0.35/assets/js/vendor/holder.min.js"></script>
+<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+<script src="https://fastly.jsdelivr.net/npm/@bootcss/v3.bootcss.com@1.0.35/assets/js/ie10-viewport-bug-workaround.js"></script>
+</body>
+</html>

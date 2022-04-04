@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+  <meta name="description" content="">
+  <meta name="author" content="wgx">
+  <link rel="canonical" href="https://getbootstrap.com/docs/3.4/examples/signin/">
+
+  <title>登录</title>
+  <!-- jQuery (Bootstrap 的所有 JavaScript 插件都依赖 jQuery，所以必须放在前边) -->
+  <script src="https://fastly.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>
+
+  <!-- Bootstrap core CSS -->
+  <link href="https://fastly.jsdelivr.net/npm/@bootcss/v3.bootcss.com@1.0.35/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+  <link href="https://fastly.jsdelivr.net/npm/@bootcss/v3.bootcss.com@1.0.35/assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+
+  <!-- Custom styles for this template -->
+  <link th:href="@{/static/css/login.css}" rel="stylesheet">
+
+  <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+  <!--[if lt IE 9]><script src="https://fastly.jsdelivr.net/npm/@bootcss/v3.bootcss.com@1.0.35/assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+  <script src="https://fastly.jsdelivr.net/npm/@bootcss/v3.bootcss.com@1.0.35/assets/js/ie-emulation-modes-warning.js"></script>
+
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!--[if lt IE 9]>
+  <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+  <![endif]-->
+
+  <script type="text/javascript">
+    $(function () {
+      //点击管理员登录或者学生登录按钮，为点击的按钮添加active，并将loginType设置为相应的属性值
+      $("#adminButton").click(function () {
+        $(this).addClass("active");
+        $("#studentButton").removeClass("active");
+        $("#loginType").val("administrator");
+      });
+      $("#studentButton").click(function () {
+        $(this).addClass("active");
+        $("#adminButton").removeClass("active");
+        $("#loginType").val("student");
+      });
+      //点击登录按钮发送ajax请求
+      $("#login").click(function () {
+        $.ajax({
+          url: "/login",
+          data: $("#loginForm").serialize(),
+          type: "POST",
+          success: function (result) {
+            if (result.statusCode == 100) {
+              //跳转页面
+              window.location.href = "/";
+            }else if (result.statusCode == 200) {
+              //<div class="alert alert-danger" role="alert">
+              //<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+              //<span class="sr-only">Error:</span>
+              //<span id="errorMessage"></span>
+              //</div>
+              let errorAlertDiv = $("#errorAlertDiv").html();
+              if (errorAlertDiv == null || errorAlertDiv.length == 0) {
+                let span1 = $("<span></span>").addClass("glyphicon glyphicon-exclamation-sign").attr("aria-hidden", "true");
+                let span2 = $("<span></span>").addClass("sr-only").text("Error:");
+                let span3 = $("<span id='errorMessage'></span>").text(result.message);
+                $("<div></div>").addClass("alert alert-danger").attr("role", "alert").append(span1).append(span2).append(span3).appendTo("#errorAlertDiv");
+              }else {
+                $("#errorAlertDiv").find("#errorMessage").text(result.message);
+              }
+            }
+          }
+        });
+      });
+    });
+  </script>
+
+</head>
+
+<body>
+
+  <div class="container">
+
+    <form class="form-signin" id="loginForm">
+      <h2 class="form-signin-heading text-center">学生宿舍管理系统</h2>
+
+      <div class="row">
+        <div class="col-md-12">
+          <input type="button" id="adminButton" class="btn btn-primary btn-lg btn-block" value="管理员">
+        </div>
+      </div>
+      <div class="row" style="margin-top: 10px;margin-bottom: 10px">
+        <div class="col-md-12">
+          <input type="button" id="studentButton" class="btn btn-primary btn-lg btn-block" value="学生">
+        </div>
+      </div>
+
+      <label for="inputAccount" class="sr-only">Account</label>
+      <input type="text" id="inputAccount" class="form-control" placeholder="学号/管理员用户名" name="account" required autofocus>
+      <label for="inputPassword" class="sr-only">Password</label>
+      <input type="password" id="inputPassword" class="form-control" placeholder="密码" name="password" required>
+
+      <!--loginType确定登录方式[管理员/学生]-->
+      <input type="hidden" id="loginType" name="loginType" value="student">
+      <!--错误信息-->
+      <div id="errorAlertDiv"></div>
+
+      <button class="btn btn-lg btn-success btn-block" type="button" id="login">登录</button>
+    </form>
+
+  </div> <!-- /container -->
+
+
+  <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+  <script src="https://fastly.jsdelivr.net/npm/@bootcss/v3.bootcss.com@1.0.35/assets/js/ie10-viewport-bug-workaround.js"></script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>导航条</title>
+</head>
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <th:block th:if="${session.student != null}">
+                <a class="navbar-brand" href="#" th:text="${session.student.studentName}">吴功勋</a>
+                <a class="navbar-brand" href="#" th:text="${session.academy.academyName}">电子信息工程学院</a>
+            </th:block>
+            <th:block th:if="${session.administrator != null}">
+                <a class="navbar-brand" href="#" th:text="${session.administrator.administratorName}">吴功勋</a>
+                <a class="navbar-brand" href="#" th:text="${session.unit}">电子信息工程学院</a>
+            </th:block>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+
+                <li><a href="#">Dashboard</a></li>
+                <li><a href="#">Settings</a></li>
+                <li role="presentation" class="dropdown">
+                    <a  class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                        项目<span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a th:href="@{/}">首页</a></li>
+                        <li><a th:href="@{/personalCenter}">个人中心</a></li>
+                        <li><a th:href="@{/studentManage}">学生管理</a></li>
+                        <li><a th:href="@{/dormitoryManage}">宿舍管理</a></li>
+                        <li><a th:href="@{/sanitaryInspection}">卫生检查</a></li>
+                        <li><a th:href="@{/paymentInformation}">缴费信息</a></li>
+                        <li><a th:href="@{/repairFeedback}">报修反馈</a></li>
+                        <li><a th:href="@{/dormitoryAnnouncement}">宿舍公告</a></li>
+                    </ul>
+                </li>
+                <li><a th:href="@{/logout}">退出登录</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+</body>
+</html>

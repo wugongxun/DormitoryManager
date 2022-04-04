@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+namespace:名称空间
+id:唯一标识
+resultType:返回值类型
+#{id}:从传递过来的参数中取出id值
+-->
+<mapper namespace="com.wgx.dormitorymanager2.mapper.StudentMapper">
+    <resultMap id="studentWithDormitoryNameResultMap" type="com.wgx.dormitorymanager2.bean.Student">
+        <id column="student_id" property="studentId"/>
+        <result column="student_name" property="studentName"/>
+        <result column="gender" property="gender"/>
+        <result column="address" property="address"/>
+        <result column="id_number" property="idNumber"/>
+        <result column="phone_number" property="phoneNumber"/>
+        <result column="academy_id" property="academyId"/>
+        <result column="major_id" property="majorId"/>
+        <result column="class_id" property="classId"/>
+        <result column="dormitory_id" property="dormitoryId"/>
+        <result column="grade" property="grade"/>
+        <result column="password" property="password"/>
+        <result column="building_id" property="buildingId"/>
+        <result column="floor_id" property="floorId"/>
+    </resultMap>
+
+    <select id="queryStudentsWithDormitoryNameByClassId" resultType="com.wgx.dormitorymanager2.bean.Student" resultMap="studentWithDormitoryNameResultMap">
+        select s.student_id, s.student_name, s.gender, s.address, s.id_number, s.phone_number, s.academy_id, s.major_id, s.class_id, s.dormitory_id, s.grade, s.password, d.building_id, d.floor_id
+        from `students_info` as s, `dormitory_info` as d
+        where s.dormitory_id = d.dormitory_id and s.class_id = #{classId}
+    </select>
+</mapper>
