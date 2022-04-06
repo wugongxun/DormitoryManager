@@ -15,6 +15,7 @@ public class MybatisPlusConfig {
     @Bean
     public PaginationInnerInterceptor paginationInnerInterceptor() {
         PaginationInnerInterceptor paginationInnerInterceptor = new PaginationInnerInterceptor();
+        //处理超出最大页面
         paginationInnerInterceptor.setOverflow(true);
         return paginationInnerInterceptor;
     }

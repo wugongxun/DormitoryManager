@@ -60,12 +60,131 @@
         });
       });
 
+      /*查询充值记录*/
+      $("#queryPaymentRecords").click(function () {
+        let dormitoryId = $(this).val();
+        $.ajax({
+          url: "/queryPaymentRecordsByDormitoryId",
+          data: "dormitoryId=" + dormitoryId,
+          type: "GET",
+          success: function (result) {
+            if (result.statusCode == 100) {
+              let page = result.attributes.paymentRecordsPage;
+              pageDisplay(page, dormitoryId);
+              $("#paymentRecordsModal").modal({
+                backdrop: "static"
+              });
+            }
+          }
+        });
+      });
+
     });
+
+    /*抽取的分页显示方法*/
+    function pageDisplay(page, dormitoryId) {
+      $("#paymentRecordsTable tr").remove();
+      let current = page.current;
+      console.log(page);
+      if (current != 1) {
+        $("#previousPage").removeClass("disabled");
+      } else {
+        $("#previousPage").addClass("disabled");
+      }
+      if (current != page.pages) {
+        $("#nextPage").removeClass("disabled");
+      } else {
+        $("#nextPage").addClass("disabled");
+      }
+      let records = page.records;
+      for (let i = 0; i < records.length; i++) {
+        let record = records[i];
+        let type = $("<td></td>").text(record.type);
+        let paymentDate = $("<td></td>").text(record.paymentDate);
+        let paymentAmount = $("<td></td>").text(record.paymentAmount);
+        let paymentAccount = $("<td></td>").text(record.paymentAccount);
+        $("<tr></tr>").append(type).append(paymentDate).append(paymentAmount).append(paymentAccount).appendTo("#paymentRecordsTable");
+      }
+      $("#previousPage").on("click", function () {
+        if ($(this).hasClass("disabled")) {
+          //如果该按钮为disabled,解除所有事件
+          $(this).unbind();
+          return;
+        }
+        $.ajax({
+          url: "/queryPaymentRecordsByDormitoryId",
+          data: "dormitoryId=" + dormitoryId + "&pageNum=" + (current - 1),
+          type: "GET",
+          success: function (result) {
+            if (result.statusCode == 100) {
+              let page_previous = result.attributes.paymentRecordsPage;
+              pageDisplay(page_previous, dormitoryId);
+            }
+          }
+        });
+      });
+      $("#nextPage").on("click", function () {
+        if ($(this).hasClass("disabled")) {
+          //如果该按钮为disabled,解除所有事件
+          $(this).unbind();
+          return;
+        }
+        $.ajax({
+          url: "/queryPaymentRecordsByDormitoryId",
+          data: "dormitoryId=" + dormitoryId + "&pageNum=" + (current + 1),
+          type: "GET",
+          success: function (result) {
+            if (result.statusCode == 100) {
+              let page_next = result.attributes.paymentRecordsPage;
+              pageDisplay(page_next, dormitoryId);
+            }
+          }
+        });
+      });
+    }
   </script>
 
 </head>
 
 <body>
+
+<!--充值记录模态框-->
+<div class="modal fade" tabindex="-1" role="dialog" id="paymentRecordsModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <th:block th:if="${dormitoryInfo != null}">
+          <h4 class="modal-title" th:text="${dormitoryInfo.buildingId} + '#' + ${dormitoryInfo.floorId}">Modal title</h4>
+        </th:block>
+      </div>
+      <div class="modal-body">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>类型</th>
+              <th>缴费时间</th>
+              <th>缴费金额</th>
+              <th>缴费账号</th>
+            </tr>
+          </thead>
+          <tbody id="paymentRecordsTable">
+
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <nav aria-label="...">
+          <ul class="pager">
+            <li class="previous" id="previousPage"><a href="#"><span aria-hidden="true">&larr;</span> 上一页</a></li>
+            <li class="next" id="nextPage"><a href="#">下一页 <span aria-hidden="true">&rarr;</span></a></li>
+          </ul>
+        </nav>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
 
 <div th:insert="~{top-navbar.html}"></div>
 
@@ -121,6 +240,24 @@
         <div class="col-md-10" th:if="${dormitoryInfo != null}">
           <h2 class="sub-header" th:text="${dormitoryInfo.buildingId} + '#' + ${dormitoryInfo.floorId}">219#204</h2>
         </div>
+        <div class="col-md-2">
+          <button class="btn btn-success" id="queryPaymentRecords" th:if="${dormitoryInfo != null}" th:value="${dormitoryInfo.dormitoryId}">查询充值记录</button>
+        </div>
+      </div>
+
+      <div class="row" th:if="${paymentInfo != null}">
+        <table class="table table-bordered">
+          <tr>
+            <td class="text-center">电费</td>
+            <td class="text-center" th:text="${paymentInfo.electricityFees}">23</td>
+            <td class="text-center"><button class="btn btn-info">充值</button></td>
+          </tr>
+          <tr>
+            <td class="text-center">空调费</td>
+            <td class="text-center" th:text="${paymentInfo.airConditioningFees}">30</td>
+            <td class="text-center"><button class="btn btn-info">充值</button></td>
+          </tr>
+        </table>
       </div>
 
     </div>
