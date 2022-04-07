@@ -3,14 +3,18 @@ F:\IDEA.java.projects\DormitoryManager2\src\main\java\com\wgx\dormitorymanager2\
 F:\IDEA.java.projects\DormitoryManager2\src\main\java\com\wgx\dormitorymanager2\mapper\AcademyMapper.java
 F:\IDEA.java.projects\DormitoryManager2\src\main\java\com\wgx\dormitorymanager2\service\LoginService.java
 F:\IDEA.java.projects\DormitoryManager2\src\main\java\com\wgx\dormitorymanager2\service\AcademyService.java
+F:\IDEA.java.projects\DormitoryManager2\src\main\java\com\wgx\dormitorymanager2\mapper\PaymentInfoMapper.java
 F:\IDEA.java.projects\DormitoryManager2\src\main\java\com\wgx\dormitorymanager2\bean\DormitoryInfo.java
 F:\IDEA.java.projects\DormitoryManager2\src\main\java\com\wgx\dormitorymanager2\controller\StudentController.java
 F:\IDEA.java.projects\DormitoryManager2\src\main\java\com\wgx\dormitorymanager2\utils\IsNumber.java
+F:\IDEA.java.projects\DormitoryManager2\src\main\java\com\wgx\dormitorymanager2\bean\PaymentInfo.java
+F:\IDEA.java.projects\DormitoryManager2\src\main\java\com\wgx\dormitorymanager2\controller\PaymentInfoController.java
 F:\IDEA.java.projects\DormitoryManager2\src\main\java\com\wgx\dormitorymanager2\bean\Administrator.java
 F:\IDEA.java.projects\DormitoryManager2\src\main\java\com\wgx\dormitorymanager2\bean\Major.java
 F:\IDEA.java.projects\DormitoryManager2\src\main\java\com\wgx\dormitorymanager2\controller\ClassInfoController.java
 F:\IDEA.java.projects\DormitoryManager2\src\main\java\com\wgx\dormitorymanager2\mapper\ClassInfoMapper.java
 F:\IDEA.java.projects\DormitoryManager2\src\main\java\com\wgx\dormitorymanager2\DormitoryManager2Application.java
+F:\IDEA.java.projects\DormitoryManager2\src\main\java\com\wgx\dormitorymanager2\mapper\PaymentRecordMapper.java
 F:\IDEA.java.projects\DormitoryManager2\src\main\java\com\wgx\dormitorymanager2\controller\MajorController.java
 F:\IDEA.java.projects\DormitoryManager2\src\main\java\com\wgx\dormitorymanager2\bean\DormitoryAnnouncement.java
 F:\IDEA.java.projects\DormitoryManager2\src\main\java\com\wgx\dormitorymanager2\mapper\MajorMapper.java
@@ -19,6 +23,7 @@ F:\IDEA.java.projects\DormitoryManager2\src\main\java\com\wgx\dormitorymanager2\
 F:\IDEA.java.projects\DormitoryManager2\src\main\java\com\wgx\dormitorymanager2\controller\LoginController.java
 F:\IDEA.java.projects\DormitoryManager2\src\main\java\com\wgx\dormitorymanager2\controller\ViewController.java
 F:\IDEA.java.projects\DormitoryManager2\src\main\java\com\wgx\dormitorymanager2\config\MybatisPlusConfig.java
+F:\IDEA.java.projects\DormitoryManager2\src\main\java\com\wgx\dormitorymanager2\bean\PaymentRecord.java
 F:\IDEA.java.projects\DormitoryManager2\src\main\java\com\wgx\dormitorymanager2\controller\DormitoryAnnouncementController.java
 F:\IDEA.java.projects\DormitoryManager2\src\main\java\com\wgx\dormitorymanager2\service\DormitoryAnnouncementService.java
 F:\IDEA.java.projects\DormitoryManager2\src\main\java\com\wgx\dormitorymanager2\bean\Academy.java
@@ -33,6 +38,7 @@ F:\IDEA.java.projects\DormitoryManager2\src\main\java\com\wgx\dormitorymanager2\
 F:\IDEA.java.projects\DormitoryManager2\src\main\java\com\wgx\dormitorymanager2\utils\ExtractNumbers.java
 F:\IDEA.java.projects\DormitoryManager2\src\main\java\com\wgx\dormitorymanager2\bean\Student.java
 F:\IDEA.java.projects\DormitoryManager2\src\main\java\com\wgx\dormitorymanager2\mapper\DormitoryInfoMapper.java
+F:\IDEA.java.projects\DormitoryManager2\src\main\java\com\wgx\dormitorymanager2\service\PaymentInfoService.java
 F:\IDEA.java.projects\DormitoryManager2\src\main\java\com\wgx\dormitorymanager2\bean\ScoreAndLikesInfo.java
 F:\IDEA.java.projects\DormitoryManager2\src\main\java\com\wgx\dormitorymanager2\config\WebConfig.java
 F:\IDEA.java.projects\DormitoryManager2\src\main\java\com\wgx\dormitorymanager2\service\MajorService.java

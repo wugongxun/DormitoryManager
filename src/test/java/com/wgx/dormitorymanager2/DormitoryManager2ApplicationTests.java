@@ -45,7 +45,7 @@ class DormitoryManager2ApplicationTests {
 	@Test
 	public void testRedis() {
 		Object score = redisTemplate.opsForValue().get("219201-score");
-//		redisTemplate.opsForValue().set("219204-score", 91);
+		redisTemplate.opsForValue().set("219204-score", 91);
 		Boolean aBoolean = redisTemplate.opsForSet().isMember("219204-likes-members", 2018011389);
 		System.out.println(score);
 		System.out.println(aBoolean);
