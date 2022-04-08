@@ -1,18 +1,19 @@
 package com.wgx.dormitorymanager2;
 
-import com.wgx.dormitorymanager2.bean.DormitoryInfo;
-import com.wgx.dormitorymanager2.bean.PaymentInfo;
-import com.wgx.dormitorymanager2.bean.PaymentRecord;
-import com.wgx.dormitorymanager2.bean.Student;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.wgx.dormitorymanager2.bean.*;
 import com.wgx.dormitorymanager2.mapper.PaymentInfoMapper;
+import com.wgx.dormitorymanager2.mapper.RepairInfoMapper;
 import com.wgx.dormitorymanager2.mapper.StudentMapper;
 import com.wgx.dormitorymanager2.service.DormitoryInfoService;
+import com.wgx.dormitorymanager2.service.RepairInfoService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 @SpringBootTest
@@ -25,6 +26,10 @@ class DormitoryManager2ApplicationTests {
 	private RedisTemplate redisTemplate;
 	@Autowired
 	private PaymentInfoMapper paymentInfoMapper;
+	@Autowired
+	private RepairInfoMapper repairInfoMapper;
+	@Autowired
+	private RepairInfoService repairInfoService;
 
 	@Test
 	void contextLoads() {
@@ -62,4 +67,23 @@ class DormitoryManager2ApplicationTests {
 		paymentRecords.stream().forEach(System.out :: println);
 	}
 
+	@Test
+	public void testRepairMapper() {
+		QueryWrapper<RepairInfo> wrapper = new QueryWrapper<>();
+		wrapper.eq("repair_dormitory", 219204);
+		List<RepairInfo> repairInfos = repairInfoMapper.selectList(wrapper);
+		System.out.println(repairInfos);
+	}
+
+	@Test
+	public void testRepairService() {
+//		Integer integer = repairInfoService.queryLastRepairId("2022-04-07");
+//		System.out.println(integer);
+		Date now = new Date();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		String repairDate = sdf.format(now);
+		repairDate += "00";
+		Integer integer1 = Integer.valueOf(repairDate.replaceAll("-", ""));
+		System.out.println(integer1);
+	}
 }
