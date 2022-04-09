@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+namespace:名称空间
+id:唯一标识
+resultType:返回值类型
+#{id}:从传递过来的参数中取出id值
+-->
+<mapper namespace="com.wgx.dormitorymanager2.mapper.RepairInfoMapper">
+
+    <resultMap id="RepairInfoResultMap" type="com.wgx.dormitorymanager2.bean.RepairInfo">
+        <id column="repair_id" property="repairId"/>
+        <result column="repair_dormitory" property="repairDormitoryId"/>
+        <result column="repair_date" property="repairDate"/>
+        <result column="repair_item" property="repairItem"/>
+        <result column="detailed_description" property="detailedDescription"/>
+        <result column="situation" property="situation"/>
+        <result column="status" property="status"/>
+        <association property="repairDormitory"
+                     javaType="com.wgx.dormitorymanager2.bean.DormitoryInfo"
+                     select="com.wgx.dormitorymanager2.mapper.DormitoryInfoMapper.selectById"
+                     column="repair_dormitory"/>
+    </resultMap>
+
+    <select id="queryAllRepairInfoAndDormitory" resultType="com.wgx.dormitorymanager2.bean.RepairInfo" resultMap="RepairInfoResultMap">
+        select * from repair_information order by repair_date desc
+    </select>
+</mapper>

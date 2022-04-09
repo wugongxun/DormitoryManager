@@ -1,5 +1,6 @@
 package com.wgx.dormitorymanager2.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wgx.dormitorymanager2.bean.Administrator;
 import com.wgx.dormitorymanager2.bean.RepairInfo;
 import com.wgx.dormitorymanager2.bean.Student;
@@ -28,7 +29,7 @@ public class RepairInfoController {
     private RepairInfoService repairInfoService;
 
     @GetMapping("/repairFeedback")
-    public ModelAndView repairFeedback(HttpSession session) {
+    public ModelAndView repairFeedback(HttpSession session, @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum) {
         ModelAndView mav = new ModelAndView();
         Student student = (Student) session.getAttribute("student");
         if (student != null) {
@@ -39,6 +40,8 @@ public class RepairInfoController {
         }
         Administrator administrator = (Administrator) session.getAttribute("administrator");
         if (administrator != null) {
+            Page<RepairInfo> repairInfosPage = repairInfoService.queryAllRepairInfoAndDormitoryByPage(pageNum);
+            mav.addObject("repairInfosPage", repairInfosPage);
             mav.setViewName("repairFeedback_administrator");
             return mav;
         }
@@ -76,7 +79,7 @@ public class RepairInfoController {
         Integer repairId = repairInfoService.queryLastRepairId(repairDate) + 1;
         Student student = (Student) session.getAttribute("student");
         Integer dormitoryId = student.getDormitoryId();
-        RepairInfo repairInfo = new RepairInfo(repairId, dormitoryId, repairDate, repairItem, detailedDescription, situation, "未处理");
+        RepairInfo repairInfo = new RepairInfo(repairId, dormitoryId, repairDate, repairItem, detailedDescription, situation, "未处理", null);
         repairInfoService.saveRepairInfo(repairInfo);
         return "forward:/repairFeedback";
     }

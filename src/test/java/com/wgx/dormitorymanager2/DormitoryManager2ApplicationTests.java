@@ -1,6 +1,7 @@
 package com.wgx.dormitorymanager2;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wgx.dormitorymanager2.bean.*;
 import com.wgx.dormitorymanager2.mapper.PaymentInfoMapper;
 import com.wgx.dormitorymanager2.mapper.RepairInfoMapper;
@@ -79,11 +80,27 @@ class DormitoryManager2ApplicationTests {
 	public void testRepairService() {
 //		Integer integer = repairInfoService.queryLastRepairId("2022-04-07");
 //		System.out.println(integer);
-		Date now = new Date();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		String repairDate = sdf.format(now);
-		repairDate += "00";
-		Integer integer1 = Integer.valueOf(repairDate.replaceAll("-", ""));
-		System.out.println(integer1);
+//		Date now = new Date();
+//		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+//		String repairDate = sdf.format(now);
+//		repairDate += "00";
+//		Integer integer1 = Integer.valueOf(repairDate.replaceAll("-", ""));
+//		System.out.println(integer1);
+		Page<RepairInfo> page = repairInfoService.queryAllRepairInfoAndDormitoryByPage(5);
+		System.out.println(page.getCurrent());
+		System.out.println(page.getTotal());
+		System.out.println(page.getPages());
+		List<RepairInfo> records = page.getRecords();
+		for (RepairInfo record : records) {
+			System.out.println(record);
+		}
+	}
+
+	@Test
+	public void testRepairInfoMapper() {
+		List<RepairInfo> repairInfos = repairInfoMapper.queryAllRepairInfoAndDormitory();
+		for (RepairInfo repairInfo : repairInfos) {
+			System.out.println(repairInfo);
+		}
 	}
 }
