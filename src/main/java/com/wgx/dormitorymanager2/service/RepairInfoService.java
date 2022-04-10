@@ -1,13 +1,9 @@
 package com.wgx.dormitorymanager2.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.metadata.OrderItem;
-import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wgx.dormitorymanager2.bean.RepairInfo;
 import com.wgx.dormitorymanager2.mapper.RepairInfoMapper;
-import org.mockito.internal.matchers.ArrayEquals;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -53,8 +49,14 @@ public class RepairInfoService {
         repairInfoMapper.insert(repairInfo);
     }
 
-    public Page<RepairInfo> queryAllRepairInfoAndDormitoryByPage(Integer pageNum) {
-        List<RepairInfo> repairInfos = repairInfoMapper.queryAllRepairInfoAndDormitory();
+    /**
+     * 查询所有RepairInfo和DormitoryInfo,并分页
+     * @param pageNum 当前的页数
+     * @param sortType 排序方式(报修日期或者紧急优先)
+     * @return
+     */
+    public Page<RepairInfo> queryAllRepairInfoAndDormitoryByPage(Integer pageNum, String sortType, Boolean showOnlyUnprocessed) {
+        List<RepairInfo> repairInfos = repairInfoMapper.queryAllRepairInfoAndDormitory(sortType, showOnlyUnprocessed);
         Page<RepairInfo> page = new Page<>(pageNum, 5);
         int total = repairInfos.size();
         int pages = 0;
@@ -84,5 +86,29 @@ public class RepairInfoService {
             page.setRecords(records);
         }
         return page;
+    }
+
+    public void finishProcessing(Integer repairId) {
+        RepairInfo repairInfo = repairInfoMapper.selectById(repairId);
+        if ("未处理".equals(repairInfo.getStatus()) || "稍后处理".equals(repairInfo.getStatus())) {
+            repairInfo.setStatus("已完成");
+            repairInfoMapper.updateById(repairInfo);
+        }
+    }
+
+    public void laterProcessing(Integer repairId) {
+        RepairInfo repairInfo = repairInfoMapper.selectById(repairId);
+        if ("未处理".equals(repairInfo.getStatus())) {
+            repairInfo.setStatus("稍后处理");
+            repairInfoMapper.updateById(repairInfo);
+        }
+    }
+
+    public void withdraw(Integer repairId) {
+        RepairInfo repairInfo = repairInfoMapper.selectById(repairId);
+        if ("未处理".equals(repairInfo.getStatus()) || "稍后处理".equals(repairInfo.getStatus())) {
+            repairInfo.setStatus("被撤回");
+            repairInfoMapper.updateById(repairInfo);
+        }
     }
 }

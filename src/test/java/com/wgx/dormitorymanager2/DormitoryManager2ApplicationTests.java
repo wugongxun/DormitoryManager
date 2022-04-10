@@ -86,7 +86,7 @@ class DormitoryManager2ApplicationTests {
 //		repairDate += "00";
 //		Integer integer1 = Integer.valueOf(repairDate.replaceAll("-", ""));
 //		System.out.println(integer1);
-		Page<RepairInfo> page = repairInfoService.queryAllRepairInfoAndDormitoryByPage(5);
+		Page<RepairInfo> page = repairInfoService.queryAllRepairInfoAndDormitoryByPage(1, "situation", true);
 		System.out.println(page.getCurrent());
 		System.out.println(page.getTotal());
 		System.out.println(page.getPages());
@@ -98,9 +98,9 @@ class DormitoryManager2ApplicationTests {
 
 	@Test
 	public void testRepairInfoMapper() {
-		List<RepairInfo> repairInfos = repairInfoMapper.queryAllRepairInfoAndDormitory();
-		for (RepairInfo repairInfo : repairInfos) {
-			System.out.println(repairInfo);
-		}
+//		List<RepairInfo> repairInfos = repairInfoMapper.queryAllRepairInfoAndDormitory();
+//		for (RepairInfo repairInfo : repairInfos) {
+//			System.out.println(repairInfo);
+//		}
 	}
 }

@@ -237,7 +237,7 @@
                                 <td th:text="${dormitoryInfo.buildingId} + '#' + ${dormitoryInfo.floorId}">219#204</td>
                                 <td th:if="${dormitoryInfo.photoName} != null">
                                     <!--上传服务器前修改为/home/wgx/dormitoryPhoto/-->
-                                    <img th:src="@{'/static/dormitoryPhoto/' + ${dormitoryInfo.photoName}}" class="img-responsive center-block pic" alt="Responsive image" style="width: 200px;height: 100%;">
+                                    <img th:src="@{'/static/dormitoryPhoto/' + ${dormitoryInfo.photoName}}" class="img-responsive center-block pic" alt="Responsive image">
                                 </td>
                                 <td th:if="${dormitoryInfo.photoName} == null">
                                     暂无照片

@@ -36,7 +36,9 @@ file:
 mybatis-plus:
   configuration:
     lazy-loading-enabled: true
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   mapper-locations: classpath:static/mapper/*.xml
+
 
 #端口修改为80
 server:

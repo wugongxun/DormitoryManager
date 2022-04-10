@@ -75,6 +75,25 @@
                 $("#errorMessage").text("");
             });
 
+            /*撤回报修*/
+            $(".withdraw").click(function () {
+                let status = $(this).parent().prev().text();
+                if (status == "已处理" || status == "被撤回") {
+                    alert("该报修" + status);
+                    return;
+                }
+                let repairId = $(this).val();
+                $.ajax({
+                    url: "/withdraw",
+                    data: "repairId=" + repairId,
+                    type: "GET",
+                    success: function (result) {
+                        window.location.reload();
+                        alert(result.message);
+                    }
+                });
+            });
+
         });
     </script>
 
@@ -166,6 +185,7 @@
                                         <td class="text-center" th:text="${repairInfo.detailedDescription}">空调经常自动关闭</td>
                                         <td class="text-center" th:text="${repairInfo.status}">已处理</td>
                                         <td class="text-center">
+                                            <button class="btn btn-success withdraw" th:value="${repairInfo.repairId}">撤回</button>
                                             <button class="btn btn-danger urge" th:value="${repairInfo.repairId}">催促</button>
                                         </td>
                                     </tr>

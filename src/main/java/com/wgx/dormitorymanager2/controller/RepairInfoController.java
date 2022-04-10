@@ -29,7 +29,10 @@ public class RepairInfoController {
     private RepairInfoService repairInfoService;
 
     @GetMapping("/repairFeedback")
-    public ModelAndView repairFeedback(HttpSession session, @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum) {
+    public ModelAndView repairFeedback(HttpSession session,
+                                       @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
+                                       @RequestParam(value = "sortType", defaultValue = "repairDate") String sortType,
+                                       @RequestParam(value = "showOnlyUnprocessed", defaultValue = "false") Boolean showOnlyUnprocessed) {
         ModelAndView mav = new ModelAndView();
         Student student = (Student) session.getAttribute("student");
         if (student != null) {
@@ -40,8 +43,11 @@ public class RepairInfoController {
         }
         Administrator administrator = (Administrator) session.getAttribute("administrator");
         if (administrator != null) {
-            Page<RepairInfo> repairInfosPage = repairInfoService.queryAllRepairInfoAndDormitoryByPage(pageNum);
+            Page<RepairInfo> repairInfosPage = repairInfoService.queryAllRepairInfoAndDormitoryByPage(pageNum, sortType, showOnlyUnprocessed);
             mav.addObject("repairInfosPage", repairInfosPage);
+            //第一次默认时间排序
+            mav.addObject("sortType", sortType);
+            mav.addObject("showOnlyUnprocessed", showOnlyUnprocessed);
             mav.setViewName("repairFeedback_administrator");
             return mav;
         }
@@ -82,5 +88,26 @@ public class RepairInfoController {
         RepairInfo repairInfo = new RepairInfo(repairId, dormitoryId, repairDate, repairItem, detailedDescription, situation, "未处理", null);
         repairInfoService.saveRepairInfo(repairInfo);
         return "forward:/repairFeedback";
+    }
+
+    @GetMapping("/finishProcessing")
+    @ResponseBody
+    public Message finishProcessing(@RequestParam("repairId") Integer repairId) {
+        repairInfoService.finishProcessing(repairId);
+        return Message.success("成功", null);
+    }
+
+    @GetMapping("/laterProcessing")
+    @ResponseBody
+    public Message laterProcessing(@RequestParam("repairId") Integer repairId) {
+        repairInfoService.laterProcessing(repairId);
+        return Message.success("成功", null);
+    }
+
+    @GetMapping("/withdraw")
+    @ResponseBody
+    public Message withdraw(@RequestParam("repairId") Integer repairId) {
+        repairInfoService.withdraw(repairId);
+        return Message.success("撤回成功", null);
     }
 }

@@ -25,6 +25,14 @@ resultType:返回值类型
     </resultMap>
 
     <select id="queryAllRepairInfoAndDormitory" resultType="com.wgx.dormitorymanager2.bean.RepairInfo" resultMap="RepairInfoResultMap">
-        select * from repair_information order by repair_date desc
+        select * from repair_information
+        <if test="showOnlyUnprocessed">
+            where `status` = '未处理'
+        </if>
+        order by
+        <if test="sortType == 'situation'">
+            situation desc,
+        </if>
+        repair_date desc
     </select>
 </mapper>

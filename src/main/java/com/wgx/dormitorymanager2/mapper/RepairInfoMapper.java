@@ -12,5 +12,5 @@ import java.util.List;
  */
 @Mapper
 public interface RepairInfoMapper extends BaseMapper<RepairInfo> {
-    List<RepairInfo> queryAllRepairInfoAndDormitory();
+    List<RepairInfo> queryAllRepairInfoAndDormitory(String sortType, Boolean showOnlyUnprocessed);
 }

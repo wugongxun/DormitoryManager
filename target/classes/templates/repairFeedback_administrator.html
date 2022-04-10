@@ -33,6 +33,75 @@
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
 
+    <script type="text/javascript">
+        $(function () {
+
+            /*修改排序方式*/
+            $("#sortType").click(function () {
+                let sortType = $(this).val();
+                let showOnlyUnprocessed = $(this).attr("showOnlyUnprocessed");
+                window.location.href = "/repairFeedback?sortType=" + sortType + "&showOnlyUnprocessed=" + showOnlyUnprocessed;
+            });
+
+            /*仅显示未处理*/
+            $("#showOnlyUnprocessed").click(function () {
+                let showOnlyUnprocessed = $(this).val();
+                let sortType = $(this).attr("sortType");
+                window.location.href = "/repairFeedback?showOnlyUnprocessed=" + showOnlyUnprocessed + "&sortType=" + sortType;
+            });
+
+            /*完成处理*/
+            $(".finishProcessing").click(function () {
+                let status = $(this).parent().prev().text();
+                if (status == "未处理" || status == "稍后处理") {
+                    let repairId = $(this).val();
+                    $.ajax({
+                        url: "/finishProcessing",
+                        data: "repairId=" + repairId,
+                        type: "GET",
+                        success: function (result) {
+                            if (result.statusCode == 200) {
+                                alert(result.message);
+                            }
+                            window.location.reload();
+                        }
+                    });
+                } else {
+                    alert("该报修" + status);
+                }
+            });
+            /*稍后处理*/
+            $(".laterProcessing").click(function () {
+                let situation = $(this).parent().prev().prev().text();
+                let status = $(this).parent().prev().text();
+                if (situation == "紧急" && status == "未处理") {
+                    if (!(confirm("该报修为紧急确认要稍后处理?"))) {
+                        return;
+                    }
+                }
+                if (status == "未处理") {
+                    let repairId = $(this).val();
+                    $.ajax({
+                        url: "/laterProcessing",
+                        data: "repairId=" + repairId,
+                        type: "GET",
+                        success: function (result) {
+                            if (result.statusCode == 200) {
+                                alert(result.message);
+                            }
+                            window.location.reload();
+                        }
+                    });
+                } else {
+                    alert("该报修" + status);
+                }
+            });
+
+            $(".disabled").click(function () {
+                return false;
+            });
+        });
+    </script>
 
 </head>
 <body>
@@ -61,8 +130,8 @@
                     <h2 class="sub-header">全部的宿舍报修</h2>
                 </div>
                 <div class="col-md-3">
-                    <button class="btn btn-info">按紧急度排序</button>
-                    <button class="btn btn-info">仅显示未处理</button>
+                    <button class="btn btn-info" id="sortType" th:value="${sortType == 'repairDate' ? 'situation' : 'repairDate'}" th:text="${sortType == 'repairDate' ? '按紧急度排序' : '按报修时间排序'}" th:showOnlyUnprocessed="${showOnlyUnprocessed}">按紧急度排序</button>
+                    <button class="btn btn-info" id="showOnlyUnprocessed" th:value="${showOnlyUnprocessed ? false : true}" th:text="${showOnlyUnprocessed ? '显示全部记录' : '仅显示未处理'}" th:sortType="${sortType}">仅显示未处理</button>
                 </div>
             </div>
 
@@ -90,8 +159,8 @@
                                 <td class="text-center" th:text="${repairInfo.situation == 1 ? '一般' : '紧急'}">紧急</td>
                                 <td class="text-center" th:text="${repairInfo.status}">已处理</td>
                                 <td class="text-center">
-                                    <button class="btn btn-success" th:value="${repairInfo.repairId}">完成处理</button>
-                                    <button class="btn btn-warning" th:value="${repairInfo.repairId}">稍后处理</button>
+                                    <button class="btn btn-success finishProcessing" th:value="${repairInfo.repairId}">完成处理</button>
+                                    <button class="btn btn-warning laterProcessing" th:value="${repairInfo.repairId}">稍后处理</button>
                                 </td>
                             </tr>
                             </tbody>
@@ -105,35 +174,45 @@
                     <nav aria-label="Page navigation">
                         <ul class="pagination">
                             <li th:class="${repairInfosPage.current == 1 ? 'disabled' : ''}">
-                                <a th:href="@{/repairFeedback(pageNum=${repairInfosPage.current - 1})}" aria-label="Previous">
+                                <a th:href="@{/repairFeedback(pageNum=${repairInfosPage.current - 1}, sortType=${sortType}, showOnlyUnprocessed=${showOnlyUnprocessed})}" aria-label="Previous">
                                     <span aria-hidden="true">&laquo;</span>
                                 </a>
                             </li>
 
-                            <th:block th:if="${repairInfosPage.current <= 3}">
-                                <li th:class="${repairInfosPage.current == 1 ? 'active' : ''}"><a th:href="@{/repairFeedback(pageNum=1)}">1</a></li>
-                                <li th:class="${repairInfosPage.current == 2 ? 'active' : ''}"><a th:href="@{/repairFeedback(pageNum=2)}">2</a></li>
-                                <li th:class="${repairInfosPage.current == 3 ? 'active' : ''}"><a th:href="@{/repairFeedback(pageNum=3)}">3</a></li>
-                                <li><a th:href="@{/repairFeedback(pageNum=4)}">4</a></li>
-                                <li><a th:href="@{/repairFeedback(pageNum=5)}">5</a></li>
+                            <th:block th:if="${repairInfosPage.pages <= 5}">
+                                <li th:class="${repairInfosPage.current == 1 ? 'active' : ''} + ${repairInfosPage.pages < 1 ? 'disabled' : ''}"><a th:href="@{/repairFeedback(pageNum=1, sortType=${sortType}, showOnlyUnprocessed=${showOnlyUnprocessed})}">1</a></li>
+                                <li th:class="${repairInfosPage.current == 2 ? 'active' : ''} + ${repairInfosPage.pages < 2 ? 'disabled' : ''}"><a th:href="@{/repairFeedback(pageNum=2, sortType=${sortType}, showOnlyUnprocessed=${showOnlyUnprocessed})}">2</a></li>
+                                <li th:class="${repairInfosPage.current == 3 ? 'active' : ''} + ${repairInfosPage.pages < 3 ? 'disabled' : ''}"><a th:href="@{/repairFeedback(pageNum=3, sortType=${sortType}, showOnlyUnprocessed=${showOnlyUnprocessed})}">3</a></li>
+                                <li th:class="${repairInfosPage.current == 4 ? 'active' : ''} + ${repairInfosPage.pages < 4 ? 'disabled' : ''}"><a th:href="@{/repairFeedback(pageNum=4, sortType=${sortType}, showOnlyUnprocessed=${showOnlyUnprocessed})}">4</a></li>
+                                <li th:class="${repairInfosPage.current == 5 ? 'active' : ''} + ${repairInfosPage.pages < 5 ? 'disabled' : ''}"><a th:href="@{/repairFeedback(pageNum=5, sortType=${sortType}, showOnlyUnprocessed=${showOnlyUnprocessed})}">5</a></li>
                             </th:block>
-                            <th:block th:if="${repairInfosPage.current > 3 && repairInfosPage.current < repairInfosPage.pages - 2}">
-                                <li><a th:href="@{/repairFeedback(pageNum=${repairInfosPage.current - 2})}" th:text="${repairInfosPage.current - 2}">1</a></li>
-                                <li><a th:href="@{/repairFeedback(pageNum=${repairInfosPage.current - 1})}" th:text="${repairInfosPage.current - 1}">2</a></li>
-                                <li class="active"><a th:href="@{/repairFeedback(pageNum=${repairInfosPage.current})}" th:text="${repairInfosPage.current}">3</a></li>
-                                <li><a th:href="@{/repairFeedback(pageNum=${repairInfosPage.current + 1})}" th:text="${repairInfosPage.current + 1}">4</a></li>
-                                <li><a th:href="@{/repairFeedback(pageNum=${repairInfosPage.current + 2})}" th:text="${repairInfosPage.current + 2}">5</a></li>
-                            </th:block>
-                            <th:block th:if="${repairInfosPage.current >= repairInfosPage.pages - 2}">
-                                <li><a th:href="@{/repairFeedback(pageNum=${repairInfosPage.pages - 4})}" th:text="${repairInfosPage.pages - 4}">1</a></li>
-                                <li><a th:href="@{/repairFeedback(pageNum=${repairInfosPage.pages - 3})}" th:text="${repairInfosPage.pages - 3}">2</a></li>
-                                <li th:class="${repairInfosPage.current == repairInfosPage.pages - 2 ? 'active' : ''}"><a th:href="@{/repairFeedback(pageNum=${repairInfosPage.pages - 2})}" th:text="${repairInfosPage.pages - 2}">3</a></li>
-                                <li th:class="${repairInfosPage.current == repairInfosPage.pages - 1 ? 'active' : ''}"><a th:href="@{/repairFeedback(pageNum=${repairInfosPage.pages - 1})}" th:text="${repairInfosPage.pages - 1}">4</a></li>
-                                <li th:class="${repairInfosPage.current == repairInfosPage.pages ? 'active' : ''}"><a th:href="@{/repairFeedback(pageNum=${repairInfosPage.pages})}" th:text="${repairInfosPage.pages}">5</a></li>
+
+                            <th:block th:if="${repairInfosPage.pages > 5}">
+                                <th:block th:if="${repairInfosPage.current <= 3}">
+                                    <li th:class="${repairInfosPage.current == 1 ? 'active' : ''}"><a th:href="@{/repairFeedback(pageNum=1, sortType=${sortType}, showOnlyUnprocessed=${showOnlyUnprocessed})}">1</a></li>
+                                    <li th:class="${repairInfosPage.current == 2 ? 'active' : ''}"><a th:href="@{/repairFeedback(pageNum=2, sortType=${sortType}, showOnlyUnprocessed=${showOnlyUnprocessed})}">2</a></li>
+                                    <li th:class="${repairInfosPage.current == 3 ? 'active' : ''}"><a th:href="@{/repairFeedback(pageNum=3, sortType=${sortType}, showOnlyUnprocessed=${showOnlyUnprocessed})}">3</a></li>
+                                    <li><a th:href="@{/repairFeedback(pageNum=4, sortType=${sortType}, showOnlyUnprocessed=${showOnlyUnprocessed})}">4</a></li>
+                                    <li><a th:href="@{/repairFeedback(pageNum=5, sortType=${sortType}, showOnlyUnprocessed=${showOnlyUnprocessed})}">5</a></li>
+                                </th:block>
+                                <th:block th:if="${repairInfosPage.current > 3 && repairInfosPage.current < repairInfosPage.pages - 2}">
+                                    <li><a th:href="@{/repairFeedback(pageNum=${repairInfosPage.current - 2}, sortType=${sortType}, showOnlyUnprocessed=${showOnlyUnprocessed})}" th:text="${repairInfosPage.current - 2}">1</a></li>
+                                    <li><a th:href="@{/repairFeedback(pageNum=${repairInfosPage.current - 1}, sortType=${sortType}, showOnlyUnprocessed=${showOnlyUnprocessed})}" th:text="${repairInfosPage.current - 1}">2</a></li>
+                                    <li class="active"><a th:href="@{/repairFeedback(pageNum=${repairInfosPage.current}, sortType=${sortType}, showOnlyUnprocessed=${showOnlyUnprocessed})}" th:text="${repairInfosPage.current}">3</a></li>
+                                    <li><a th:href="@{/repairFeedback(pageNum=${repairInfosPage.current + 1}, sortType=${sortType}, showOnlyUnprocessed=${showOnlyUnprocessed})}" th:text="${repairInfosPage.current + 1}">4</a></li>
+                                    <li><a th:href="@{/repairFeedback(pageNum=${repairInfosPage.current + 2}, sortType=${sortType}, showOnlyUnprocessed=${showOnlyUnprocessed})}" th:text="${repairInfosPage.current + 2}">5</a></li>
+                                </th:block>
+                                <th:block th:if="${repairInfosPage.current >= repairInfosPage.pages - 2}">
+                                    <li><a th:href="@{/repairFeedback(pageNum=${repairInfosPage.pages - 4}, sortType=${sortType}, showOnlyUnprocessed=${showOnlyUnprocessed})}" th:text="${repairInfosPage.pages - 4}">1</a></li>
+                                    <li><a th:href="@{/repairFeedback(pageNum=${repairInfosPage.pages - 3}, sortType=${sortType}, showOnlyUnprocessed=${showOnlyUnprocessed})}" th:text="${repairInfosPage.pages - 3}">2</a></li>
+                                    <li th:class="${repairInfosPage.current == repairInfosPage.pages - 2 ? 'active' : ''}"><a th:href="@{/repairFeedback(pageNum=${repairInfosPage.pages - 2}, sortType=${sortType}, showOnlyUnprocessed=${showOnlyUnprocessed})}" th:text="${repairInfosPage.pages - 2}">3</a></li>
+                                    <li th:class="${repairInfosPage.current == repairInfosPage.pages - 1 ? 'active' : ''}"><a th:href="@{/repairFeedback(pageNum=${repairInfosPage.pages - 1}, sortType=${sortType}, showOnlyUnprocessed=${showOnlyUnprocessed})}" th:text="${repairInfosPage.pages - 1}">4</a></li>
+                                    <li th:class="${repairInfosPage.current == repairInfosPage.pages ? 'active' : ''}"><a th:href="@{/repairFeedback(pageNum=${repairInfosPage.pages}, sortType=${sortType}, showOnlyUnprocessed=${showOnlyUnprocessed})}" th:text="${repairInfosPage.pages}">5</a></li>
+                                </th:block>
                             </th:block>
 
                             <li th:class="${repairInfosPage.current == repairInfosPage.pages ? 'disabled' : ''}">
-                                <a th:href="@{/repairFeedback(pageNum=${repairInfosPage.current + 1})}" aria-label="Next">
+                                <a th:href="@{/repairFeedback(pageNum=${repairInfosPage.current + 1}, sortType=${sortType}, showOnlyUnprocessed=${showOnlyUnprocessed})}" aria-label="Next">
                                     <span aria-hidden="true">&raquo;</span>
                                 </a>
                             </li>
