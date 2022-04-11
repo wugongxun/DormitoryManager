@@ -39,4 +39,14 @@ public class DormitoryAnnouncementService {
         }).collect(Collectors.toList());
         return dormitoryAnnouncementPage.setRecords(dormitoryAnnouncements);
     }
+
+    public List<DormitoryAnnouncement> dormitoryAnnouncement() {
+        return dormitoryAnnouncementMapper.selectList(null);
+    }
+    public void releaseAnnouncement(DormitoryAnnouncement dormitoryAnnouncement) {
+        dormitoryAnnouncementMapper.insert(dormitoryAnnouncement);
+    }
+    public void deleteAnnouncement(Integer announcementId) {
+        dormitoryAnnouncementMapper.deleteById(announcementId);
+    }
 }

@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="canonical" href="https://getbootstrap.com/docs/3.4/examples/dashboard/">
+
+    <title>宿舍公告</title>
+
+    <!-- jQuery (Bootstrap 的所有 JavaScript 插件都依赖 jQuery，所以必须放在前边) -->
+    <script src="https://fastly.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>
+
+    <!-- Bootstrap core CSS -->
+    <link href="https://fastly.jsdelivr.net/npm/@bootcss/v3.bootcss.com@1.0.35/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="https://fastly.jsdelivr.net/npm/@bootcss/v3.bootcss.com@1.0.35/assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link th:href="@{/static/css/index.css}" href="../static/css/index.css" rel="stylesheet">
+
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="https://fastly.jsdelivr.net/npm/@bootcss/v3.bootcss.com@1.0.35/assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <script src="https://fastly.jsdelivr.net/npm/@bootcss/v3.bootcss.com@1.0.35/assets/js/ie-emulation-modes-warning.js"></script>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <script type="text/javascript">
+        $(function () {
+            /*打开模态框*/
+           $("#releaseAnnouncementButton").click(function () {
+                $("#releaseAnnouncementModal").modal({
+                    backdrop: 'static'
+                });
+           });
+           /*关闭模态框*/
+            $("#close").click(function () {
+                window.location.reload();
+            });
+
+            /*过期时间的改变*/
+            $("#expirationDate").on("change", function () {
+               let expirationDate = $(this).val();
+               if (expirationDate == "selfInput") {
+                   $("#expirationDate").remove();
+                   $("<input type='text' class='form-control' id='expirationDateInput' name='expirationDate' placeholder='请按2018-09-01格式输入'>").appendTo("#expirationDateDiv");
+                   $("<span id='expirationDateErrorMessage' class='help-block error'></span>").appendTo("#expirationDateDiv");
+               }
+            });
+
+            /*发布公告校验*/
+            $("#releaseAnnouncement").click(function () {
+                let content = $("#content").val();
+                if (content.length > 500) {
+                    $("#contentDiv").addClass("has-error");
+                    $("#contentErrorMessage").text("字数不能超过500");
+                    return false;
+                }
+                let expirationDate = $("#expirationDateInput").val();
+                if (expirationDate != undefined) {
+                    /*判断格式*/
+                    let regDate = /^\d{4}-\d{2}-\d{2}$/;
+                    let test = regDate.test(expirationDate);
+                    if (!test) {
+                        $("#expirationDateDiv").addClass("has-error");
+                        $("#expirationDateErrorMessage").text("格式错误");
+                        return false;
+                    }
+                    let now = new Date();
+                    let regStr = /-/g;
+                    expirationDate = expirationDate.replace(regStr, "/");
+                    expirationDate = new Date(expirationDate);
+                    if (now > expirationDate) {
+                        $("#expirationDateDiv").addClass("has-error");
+                        $("#expirationDateErrorMessage").text("过期时间必须在当前时间之后");
+                        return false;
+                    }
+                }
+            });
+
+            /*删除公告*/
+            $(".deleteAnnouncement").click(function () {
+                if (!(confirm("确认要删除吗?"))) {
+                    return false;
+                }
+                let announcementId = $(this).val();
+                $.ajax({
+                    url: "/deleteAnnouncement",
+                    data: "announcementId=" + announcementId,
+                    type: "GET",
+                    success: function (result) {
+                        if (result.statusCode == 100) {
+                            window.location.reload();
+                        }
+                    }
+                });
+            });
+
+        });
+    </script>
+
+</head>
+<body>
+
+<!--发布公告模态框-->
+<div class="modal fade" tabindex="-1" role="dialog" id="releaseAnnouncementModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">发布公告</h4>
+            </div>
+            <div class="modal-body">
+                <form th:action="@{/releaseAnnouncement}">
+                    <div class="form-group">
+                        <label for="title">标题</label>
+                        <input type="text" class="form-control" id="title" name="title" placeholder="标题">
+                    </div>
+                    <div class="form-group" id="contentDiv">
+                        <label for="content">内容</label>
+                        <textarea class="form-control" rows="3" id="content" name="content" placeholder="内容"></textarea>
+                        <span id="contentErrorMessage" class="help-block error"></span>
+                    </div>
+                    <div class="form-group" id="expirationDateDiv">
+                        <label for="expirationDate">过期时间</label>
+                        <select class="form-control" id="expirationDate" name="expirationDate">
+                            <option value="oneMonth">一个月</option>
+                            <option value="threeMonth">三个月</option>
+                            <option value="sixMonth">六个月</option>
+                            <option value="oneYear">一年</option>
+                            <option value="selfInput">输入</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal" id="close">关闭</button>
+                        <button type="submit" class="btn btn-primary" id="releaseAnnouncement">发布</button>
+                    </div>
+                </form>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div th:insert="~{top-navbar.html}"></div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+            <ul class="nav nav-sidebar">
+                <li><a th:href="@{/}">首页</a></li>
+                <li><a th:href="@{/personalCenter}">个人中心</a></li>
+                <li><a th:href="@{/studentManage}">学生管理</a></li>
+                <li><a th:href="@{/dormitoryManage}">宿舍管理</a></li>
+                <li><a th:href="@{/sanitaryInspection}">卫生检查</a></li>
+                <li><a th:href="@{/paymentInformation}">缴费信息</a></li>
+                <li><a th:href="@{/repairFeedback}">报修反馈</a></li>
+                <li><a th:href="@{/dormitoryAnnouncement}">宿舍公告</a></li>
+            </ul>
+        </div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+            <h1 class="page-header">宿舍公告</h1>
+
+            <div class="row">
+                <div class="col-md-10">
+                    <h2 class="sub-header">全部的宿舍公告</h2>
+                </div>
+                <div class="col-md-2" th:if="${session.administrator != null}">
+                    <button class="btn btn-info" id="releaseAnnouncementButton">发布公告</button>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover text-center">
+                            <thead>
+                            <tr>
+                                <th class="text-center">标题</th>
+                                <th class="text-center">发布者</th>
+                                <th class="text-center">发布时间</th>
+                                <th class="text-center">过期时间</th>
+                                <th class="text-center">操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="dormitoryAnnouncement :  ${dormitoryAnnouncements}">
+                                <td class="text-center" th:text="${dormitoryAnnouncement.title}">2022级新生入学报到须知</td>
+                                <td class="text-center" th:text="${dormitoryAnnouncement.publisher}">admin</td>
+                                <td class="text-center" th:text="${dormitoryAnnouncement.releaseDate}">2022-02-18</td>
+                                <td class="text-center" th:text="${dormitoryAnnouncement.expirationDate}">2022-06-01</td>
+                                <td class="text-center">
+                                    <button class="btn btn-success">查看</button>
+                                    <button class="btn btn-danger deleteAnnouncement" th:if="${session.administrator != null}" th:value="${dormitoryAnnouncement.announcementId}">删除</button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="https://fastly.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>
+<script>window.jQuery || document.write('<script src="https://fastly.jsdelivr.net/npm/@bootcss/v3.bootcss.com@1.0.35/assets/js/vendor/jquery.min.js"><\/script>')</script>
+<script src="https://fastly.jsdelivr.net/npm/@bootcss/v3.bootcss.com@1.0.35/dist/js/bootstrap.min.js"></script>
+<!-- Just to make our placeholder images work. Don't actually copy the next line! -->
+<script src="https://fastly.jsdelivr.net/npm/@bootcss/v3.bootcss.com@1.0.35/assets/js/vendor/holder.min.js"></script>
+<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+<script src="https://fastly.jsdelivr.net/npm/@bootcss/v3.bootcss.com@1.0.35/assets/js/ie10-viewport-bug-workaround.js"></script>
+</body>
+</html>
