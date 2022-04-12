@@ -84,6 +84,11 @@
                         return false;
                     }
                 }
+                /*处理文本*/
+                // content = content.replace(/\r\n/g, "<br/>");
+                // content = content.replace(/\n/g, "<br/>");
+                // content = content.replace(/\s/g, "&nbsp;");
+                // $("#content").val(content);
             });
 
             /*删除公告*/
@@ -102,6 +107,12 @@
                         }
                     }
                 });
+            });
+
+            /*查看公告*/
+            $(".showAnnouncement").click(function () {
+                let announcementId = $(this).val();
+                window.location.href = "/queryDormitoryAnnouncementPageByAnnouncementId?announcementId=" + announcementId;
             });
 
         });
@@ -196,7 +207,7 @@
                                 <td class="text-center" th:text="${dormitoryAnnouncement.releaseDate}">2022-02-18</td>
                                 <td class="text-center" th:text="${dormitoryAnnouncement.expirationDate}">2022-06-01</td>
                                 <td class="text-center">
-                                    <button class="btn btn-success">查看</button>
+                                    <button class="btn btn-success showAnnouncement" th:value="${dormitoryAnnouncement.announcementId}">查看</button>
                                     <button class="btn btn-danger deleteAnnouncement" th:if="${session.administrator != null}" th:value="${dormitoryAnnouncement.announcementId}">删除</button>
                                 </td>
                             </tr>

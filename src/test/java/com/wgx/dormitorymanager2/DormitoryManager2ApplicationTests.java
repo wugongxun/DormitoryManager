@@ -6,6 +6,7 @@ import com.wgx.dormitorymanager2.bean.*;
 import com.wgx.dormitorymanager2.mapper.PaymentInfoMapper;
 import com.wgx.dormitorymanager2.mapper.RepairInfoMapper;
 import com.wgx.dormitorymanager2.mapper.StudentMapper;
+import com.wgx.dormitorymanager2.service.DormitoryAnnouncementService;
 import com.wgx.dormitorymanager2.service.DormitoryInfoService;
 import com.wgx.dormitorymanager2.service.RepairInfoService;
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @SpringBootTest
 class DormitoryManager2ApplicationTests {
@@ -31,6 +33,8 @@ class DormitoryManager2ApplicationTests {
 	private RepairInfoMapper repairInfoMapper;
 	@Autowired
 	private RepairInfoService repairInfoService;
+	@Autowired
+	private DormitoryAnnouncementService dormitoryAnnouncementService;
 
 	@Test
 	void contextLoads() {
@@ -102,5 +106,24 @@ class DormitoryManager2ApplicationTests {
 //		for (RepairInfo repairInfo : repairInfos) {
 //			System.out.println(repairInfo);
 //		}
+	}
+
+	@Test
+	public void testDormitoryAnnouncementService() {
+//		Page<DormitoryAnnouncement> dormitoryAnnouncementPage = dormitoryAnnouncementService.queryDormitoryAnnouncementPageByAnnouncementId(1);
+//		System.out.println(dormitoryAnnouncementPage.getCurrent());
+//		System.out.println(dormitoryAnnouncementPage.getTotal());
+//		System.out.println(dormitoryAnnouncementPage.getPages());
+//		System.out.println(dormitoryAnnouncementPage.getRecords());
+		DormitoryAnnouncement dormitoryAnnouncement = dormitoryAnnouncementService.queryDormitoryAnnouncementById(1);
+		System.out.println(dormitoryAnnouncement);
+		System.out.println(dormitoryAnnouncement != null);
+	}
+
+	@Test
+	public void testUUID() {
+		UUID uuid = UUID.randomUUID();
+		String photoName = uuid.toString().replaceAll("-", "");
+		System.out.println(photoName);
 	}
 }

@@ -42,8 +42,8 @@ public class DormitoryInfoController {
 
     @PostMapping("/uploadDormitoryPhoto")
     @ResponseBody
-    public Message uploadDormitoryPhoto(@RequestParam("photo") MultipartFile photo, @RequestParam("dormitoryPhotoName") String dormitoryPhotoName) throws IOException {
-        return dormitoryInfoService.uploadDormitoryPhoto (photo, dormitoryPhotoName);
+    public Message uploadDormitoryPhoto(@RequestParam("photo") MultipartFile photo, @RequestParam("dormitoryId") Integer dormitoryId) throws IOException {
+        return dormitoryInfoService.uploadDormitoryPhoto (photo, dormitoryId);
     }
     @GetMapping("/queryAllDormitory")
     @ResponseBody

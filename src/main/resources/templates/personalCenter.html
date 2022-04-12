@@ -95,7 +95,7 @@
                 }else {
                     let formData = new FormData();
                     formData.append("photo", photoFile);
-                    formData.append("dormitoryPhotoName", $("#dormitoryPhotoName").val());
+                    formData.append("dormitoryId", $("#dormitoryId").val());
                     $.ajax({
                         url: "/uploadDormitoryPhoto",
                         data: formData,
@@ -213,7 +213,7 @@
                     <!--隐藏的文件上传表单-->
                     <form method="post" enctype="multipart/form-data" id="photoUploadForm" style="display: none">
                         <input type="file" name="photo" id="photo" accept="image/jpeg,image/png" maxlength="4096">
-                        <input type="hidden" name="dormitoryPhotoName" id="dormitoryPhotoName" th:value="${dormitoryInfo.photoName}">
+                        <input type="hidden" name="dormitoryId" id="dormitoryId" th:value="${dormitoryInfo.dormitoryId}">
                     </form>
                 </th:block>
 

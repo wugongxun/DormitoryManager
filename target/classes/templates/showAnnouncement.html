@@ -35,36 +35,47 @@
 
     <script type="text/javascript">
         $(function () {
-            /*打开模态框*/
-           $("#releaseAnnouncementButton").click(function () {
-                $("#releaseAnnouncementModal").modal({
-                    backdrop: 'static'
-                });
-           });
-           /*关闭模态框*/
+
+            $("#returnDormitoryAnnouncementList").click(function () {
+                window.location.href = "/dormitoryAnnouncement";
+            });
+
             $("#close").click(function () {
                 window.location.reload();
             });
 
-            /*过期时间的改变*/
-            $("#expirationDate").on("change", function () {
-               let expirationDate = $(this).val();
-               if (expirationDate == "selfInput") {
-                   $("#expirationDate").remove();
-                   $("<input type='text' class='form-control' id='expirationDateInput' name='expirationDate' placeholder='请按2018-09-01格式输入'>").appendTo("#expirationDateDiv");
-                   $("<span id='expirationDateErrorMessage' class='help-block error'></span>").appendTo("#expirationDateDiv");
-               }
+            $("#changeAnnouncementButton").click(function () {
+                let announcementId = $(this).val();
+                $.ajax({
+                    url: "/queryDormitoryAnnouncementById",
+                    data: "announcementId=" + announcementId,
+                    type: "GET",
+                    success: function (result) {
+                        if (result.statusCode == 200) {
+                            alert(result.message);
+                        } else {
+                            let dormitoryAnnouncement = result.attributes.dormitoryAnnouncement;
+                            $("#title").val(dormitoryAnnouncement.title);
+                            $("#content").val(dormitoryAnnouncement.content);
+                            $("#expirationDate").val(dormitoryAnnouncement.expirationDate);
+                            $("#announcementIdToChange").val(dormitoryAnnouncement.announcementId);
+                            $("#changeAnnouncementModal").modal({
+                                backdrop: 'static'
+                            });
+                        }
+                    }
+                });
             });
 
-            /*发布公告校验*/
-            $("#releaseAnnouncement").click(function () {
+            /*校验*/
+            $("#changeAnnouncement").click(function () {
                 let content = $("#content").val();
                 if (content.length > 500) {
                     $("#contentDiv").addClass("has-error");
                     $("#contentErrorMessage").text("字数不能超过500");
                     return false;
                 }
-                let expirationDate = $("#expirationDateInput").val();
+                let expirationDate = $("#expirationDate").val();
                 if (expirationDate != undefined) {
                     /*判断格式*/
                     let regDate = /^\d{4}-\d{2}-\d{2}$/;
@@ -84,35 +95,6 @@
                         return false;
                     }
                 }
-                /*处理文本*/
-                // content = content.replace(/\r\n/g, "<br/>");
-                // content = content.replace(/\n/g, "<br/>");
-                // content = content.replace(/\s/g, "&nbsp;");
-                // $("#content").val(content);
-            });
-
-            /*删除公告*/
-            $(".deleteAnnouncement").click(function () {
-                if (!(confirm("确认要删除吗?"))) {
-                    return false;
-                }
-                let announcementId = $(this).val();
-                $.ajax({
-                    url: "/deleteAnnouncement",
-                    data: "announcementId=" + announcementId,
-                    type: "GET",
-                    success: function (result) {
-                        if (result.statusCode == 100) {
-                            window.location.reload();
-                        }
-                    }
-                });
-            });
-
-            /*查看公告*/
-            $(".showAnnouncement").click(function () {
-                let announcementId = $(this).val();
-                window.location.href = "/queryDormitoryAnnouncementPageByAnnouncementId?announcementId=" + announcementId;
             });
 
         });
@@ -121,15 +103,16 @@
 </head>
 <body>
 
-<!--发布公告模态框-->
-<div class="modal fade" tabindex="-1" role="dialog" id="releaseAnnouncementModal">
+<!--修改公告模态框-->
+<div class="modal fade" tabindex="-1" role="dialog" id="changeAnnouncementModal">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">发布公告</h4>
+                <h4 class="modal-title">修改公告</h4>
             </div>
             <div class="modal-body">
-                <form th:action="@{/releaseAnnouncement}">
+                <form th:action="@{/changeAnnouncement}">
+                    <input type="hidden" name="announcementId" id="announcementIdToChange">
                     <div class="form-group">
                         <label for="title">标题</label>
                         <input type="text" class="form-control" id="title" name="title" placeholder="标题">
@@ -141,23 +124,19 @@
                     </div>
                     <div class="form-group" id="expirationDateDiv">
                         <label for="expirationDate">过期时间</label>
-                        <select class="form-control" id="expirationDate" name="expirationDate">
-                            <option value="oneMonth">一个月</option>
-                            <option value="threeMonth">三个月</option>
-                            <option value="sixMonth">六个月</option>
-                            <option value="oneYear">一年</option>
-                            <option value="selfInput">输入</option>
-                        </select>
+                        <input type="text" class="form-control" id="expirationDate" name="expirationDate" placeholder="请按2018-09-01格式输入">
+                        <span id="expirationDateErrorMessage" class="help-block error"></span>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal" id="close">关闭</button>
-                        <button type="submit" class="btn btn-primary" id="releaseAnnouncement">发布</button>
+                        <button type="submit" class="btn btn-primary" id="changeAnnouncement">保存</button>
                     </div>
                 </form>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+
 
 <div th:insert="~{top-navbar.html}"></div>
 
@@ -178,42 +157,52 @@
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
             <h1 class="page-header">宿舍公告</h1>
 
-            <div class="row">
+            <div class="row" th:each="dormitoryAnnouncement : ${dormitoryAnnouncementPage.records}">
                 <div class="col-md-10">
-                    <h2 class="sub-header">全部的宿舍公告</h2>
+                    <h2 class="page-header text-center" th:text="${dormitoryAnnouncement.title}">2022级新生入学报到须知</h2>
                 </div>
-                <div class="col-md-2" th:if="${session.administrator != null}">
-                    <button class="btn btn-info" id="releaseAnnouncementButton">发布公告</button>
+                <div class="col-md-2">
+                    <button class="btn btn-success" id="returnDormitoryAnnouncementList">返回列表</button>
+                    <button class="btn btn-info" id="changeAnnouncementButton" th:value="${dormitoryAnnouncement.announcementId}" th:if="${session.administrator != null}">修改公告</button>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12" th:each="dormitoryAnnouncement : ${dormitoryAnnouncementPage.records}">
+                    <h4 class="bg-info" style="white-space: pre-wrap" th:text="${dormitoryAnnouncement.content}">
+                        在各系报到点领取《宿舍钥匙领取单》，由各系青年志愿者带到宿舍楼栋领取宿舍钥匙，入住宿舍。
+                        新同学入学后，教务处统一编制学号，财务处再根据学号、姓名、年级、专业等信息制新生一卡通，
+                        制卡完毕后由各班统一领取发放。
+                        途中一定要注意人身安全，并保管好随身所带，贵重物品及各种证件已经防丢失。
+                        所有费用由学校财务处统一收取，并开具安徽省学校专用收费票据，
+                        学校不会委托其他部门或个人代收任何费用。 口罩：同学们记得多备点口罩，无论是在校园的路上还是教学楼、
+                        食堂等室内都要戴好口罩，并保持安全距离。 体温计：在校期间，需要进行早、中、晚体温测量，
+                        并坚持每日健康打卡，体温计可以选择传统的水银体温计或者更便捷的电子体温计。 来校途中要全程佩戴好口罩，
+                        在公共交通工具上尽量减少与其他人员交流，避免聚集，与同乘者尽量保持距离。尽量避免直接触摸门把手、
+                        电梯按钮等公共设施，接触后要及时洗手或用速干手消毒剂等擦拭清洁处理。
+                    </h4>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12" th:each="dormitoryAnnouncement : ${dormitoryAnnouncementPage.records}">
+                    <div class="text-right" th:text="${dormitoryAnnouncement.publisher}">admin</div>
+                    <div class="text-right" th:text="${dormitoryAnnouncement.releaseDate}">2022-02-18</div>
                 </div>
             </div>
 
             <div class="row">
                 <div class="col-md-12">
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover text-center">
-                            <thead>
-                            <tr>
-                                <th class="text-center">标题</th>
-                                <th class="text-center">发布者</th>
-                                <th class="text-center">发布时间</th>
-                                <th class="text-center">过期时间</th>
-                                <th class="text-center">操作</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr th:each="dormitoryAnnouncement :  ${dormitoryAnnouncements}">
-                                <td class="text-center" th:text="${dormitoryAnnouncement.title}">2022级新生入学报到须知</td>
-                                <td class="text-center" th:text="${dormitoryAnnouncement.publisher}">admin</td>
-                                <td class="text-center" th:text="${dormitoryAnnouncement.releaseDate}">2022-02-18</td>
-                                <td class="text-center" th:text="${dormitoryAnnouncement.expirationDate}">2022-06-01</td>
-                                <td class="text-center">
-                                    <button class="btn btn-success showAnnouncement" th:value="${dormitoryAnnouncement.announcementId}">查看</button>
-                                    <button class="btn btn-danger deleteAnnouncement" th:if="${session.administrator != null}" th:value="${dormitoryAnnouncement.announcementId}">删除</button>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    <nav aria-label="...">
+                        <ul class="pager">
+                            <th:block th:if="${dormitoryAnnouncementPage.current != 1}">
+                                <li class="previous"><a th:href="@{/showDormitoryAnnouncement(pageNum=${dormitoryAnnouncementPage.current - 1})}"><span aria-hidden="true">&larr;</span> 上一条</a></li>
+                            </th:block>
+                            <th:block th:if="${dormitoryAnnouncementPage.current != dormitoryAnnouncementPage.total}">
+                                <li class="next"><a th:href="@{/showDormitoryAnnouncement(pageNum=${dormitoryAnnouncementPage.current + 1})}">下一条 <span aria-hidden="true">&rarr;</span></a></li>
+                            </th:block>
+                        </ul>
+                    </nav>
                 </div>
             </div>
 

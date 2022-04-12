@@ -8,8 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -21,9 +20,7 @@ public class DormitoryAnnouncementService {
     @Autowired
     DormitoryAnnouncementMapper dormitoryAnnouncementMapper;
     public Page<DormitoryAnnouncement> queryDormitoryAnnouncementNotExpired(Integer pageNum) throws ParseException {
-        Page<DormitoryAnnouncement> page = new Page<>(pageNum, 1);
-        Page<DormitoryAnnouncement> dormitoryAnnouncementPage = dormitoryAnnouncementMapper.selectPage(page, null);
-        List<DormitoryAnnouncement> dormitoryAnnouncements = dormitoryAnnouncementPage.getRecords();
+        List<DormitoryAnnouncement> dormitoryAnnouncements = dormitoryAnnouncementMapper.selectList(null);
         Date currentDate = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         //过滤过期的公告
@@ -37,7 +34,11 @@ public class DormitoryAnnouncementService {
                 throw new RuntimeException(e);
             }
         }).collect(Collectors.toList());
-        return dormitoryAnnouncementPage.setRecords(dormitoryAnnouncements);
+        Page<DormitoryAnnouncement> dormitoryAnnouncementPage = new Page<>(pageNum, 1);
+        dormitoryAnnouncementPage.setTotal(dormitoryAnnouncements.size());
+        dormitoryAnnouncementPage.setRecords(Arrays.asList(dormitoryAnnouncements.get(pageNum - 1)));
+        dormitoryAnnouncementPage.setPages(dormitoryAnnouncements.size());
+        return dormitoryAnnouncementPage;
     }
 
     public List<DormitoryAnnouncement> dormitoryAnnouncement() {
@@ -49,4 +50,32 @@ public class DormitoryAnnouncementService {
     public void deleteAnnouncement(Integer announcementId) {
         dormitoryAnnouncementMapper.deleteById(announcementId);
     }
+    public Page<DormitoryAnnouncement> queryDormitoryAnnouncementPageByAnnouncementId(Integer announcementId) {
+        List<DormitoryAnnouncement> dormitoryAnnouncements = dormitoryAnnouncementMapper.selectList(null);
+        int current = 0;
+        ArrayList<DormitoryAnnouncement> records = new ArrayList<>();
+        for (int i = 0; i < dormitoryAnnouncements.size(); i++) {
+            if (dormitoryAnnouncements.get(i).getAnnouncementId() == announcementId) {
+                current = i + 1;
+                records.add(dormitoryAnnouncements.get(i));
+                break;
+            }
+        }
+        Page<DormitoryAnnouncement> dormitoryAnnouncementPage = new Page<>(current, 1);
+        dormitoryAnnouncementPage.setRecords(records);
+        dormitoryAnnouncementPage.setPages(dormitoryAnnouncements.size());
+        dormitoryAnnouncementPage.setTotal(dormitoryAnnouncements.size());
+        return dormitoryAnnouncementPage;
+    }
+    public Page<DormitoryAnnouncement> queryDormitoryAnnouncementPage(Integer pageNum) {
+        Page<DormitoryAnnouncement> page = new Page<>(pageNum, 1);
+        return dormitoryAnnouncementMapper.selectPage(page, null);
+    }
+    public DormitoryAnnouncement queryDormitoryAnnouncementById(Integer announcementId) {
+        return dormitoryAnnouncementMapper.selectById(announcementId);
+    }
+    public void changeAnnouncement(DormitoryAnnouncement dormitoryAnnouncement) {
+        dormitoryAnnouncementMapper.updateById(dormitoryAnnouncement);
+    }
+
 }

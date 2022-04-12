@@ -74,7 +74,7 @@
 
       <div class="row">
         <div class="col-md-12" th:each="dormitoryAnnouncement : ${dormitoryAnnouncementPage.records}">
-          <h4 class="bg-info" th:text="${dormitoryAnnouncement.content}">&nbsp&nbsp在各系报到点领取《宿舍钥匙领取单》，由各系青年志愿者带到宿舍楼栋领取宿舍钥匙，入住宿舍。
+          <h4 class="bg-info" th:text="${dormitoryAnnouncement.content}" style="white-space: pre-wrap">&nbsp&nbsp在各系报到点领取《宿舍钥匙领取单》，由各系青年志愿者带到宿舍楼栋领取宿舍钥匙，入住宿舍。
             新同学入学后，教务处统一编制学号，财务处再根据学号、姓名、年级、专业等信息制新生一卡通，制卡完毕后由各班统一领取发放。
             途中一定要注意人身安全，并保管好随身所带，贵重物品及各种证件已经防丢失。所有费用由学校财务处统一收取，并开具安徽省学校专用收费票据，学校不会委托其他部门或个人代收任何费用。
             口罩：同学们记得多备点口罩，无论是在校园的路上还是教学楼、食堂等室内都要戴好口罩，并保持安全距离。
@@ -87,10 +87,10 @@
         <div class="col-md-12">
           <nav aria-label="...">
             <ul class="pager">
-              <th:block th:if="${dormitoryAnnouncementPage.hasPrevious()}">
+              <th:block th:if="${dormitoryAnnouncementPage.current != 1}">
                 <li class="previous"><a th:href="@{/queryDormitoryAnnouncement(pageNum=${dormitoryAnnouncementPage.current - 1})}"><span aria-hidden="true">&larr;</span> 上一条</a></li>
               </th:block>
-              <th:block th:if="${dormitoryAnnouncementPage.hasNext()}">
+              <th:block th:if="${dormitoryAnnouncementPage.current != dormitoryAnnouncementPage.pages}">
                 <li class="next"><a th:href="@{/queryDormitoryAnnouncement(pageNum=${dormitoryAnnouncementPage.current + 1})}">下一条 <span aria-hidden="true">&rarr;</span></a></li>
               </th:block>
             </ul>

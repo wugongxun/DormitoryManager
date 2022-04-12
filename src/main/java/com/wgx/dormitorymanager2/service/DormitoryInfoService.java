@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * author:wgx
@@ -32,10 +33,19 @@ public class DormitoryInfoService {
         return dormitoryInfoMapper.selectList(null);
     }
 
-    public Message uploadDormitoryPhoto(MultipartFile photo, String dormitoryPhotoName) throws IOException {
+    public Message uploadDormitoryPhoto(MultipartFile photo, Integer dormitoryId) throws IOException {
         if (photo.isEmpty()) {
             return Message.fail("文件为空", null);
         }
+        String originalFilename = photo.getOriginalFilename();
+        String suffix = originalFilename.substring(originalFilename.lastIndexOf("."));//获取后缀
+        UUID uuid = UUID.randomUUID();
+        String prefix = uuid.toString().replaceAll("-", "");//随机生成前缀
+        String dormitoryPhotoName = prefix + suffix;
+        //将数据库中的对应宿舍的dormitoryPhotoName修改为上传后的名字
+        DormitoryInfo dormitoryInfo = dormitoryInfoMapper.selectById(dormitoryId);
+        dormitoryInfo.setPhotoName(dormitoryPhotoName);
+        dormitoryInfoMapper.updateById(dormitoryInfo);
         File file = new File(uploadFolder);
         if(!file.exists()){
             file.mkdir();

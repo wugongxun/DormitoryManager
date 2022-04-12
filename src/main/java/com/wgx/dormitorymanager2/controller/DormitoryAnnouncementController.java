@@ -20,6 +20,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -89,5 +90,45 @@ public class DormitoryAnnouncementController {
     public Message deleteAnnouncement(@RequestParam("announcementId") Integer announcementId) {
         dormitoryAnnouncementService.deleteAnnouncement(announcementId);
         return Message.success("成功", null);
+    }
+
+    @GetMapping("/queryDormitoryAnnouncementPageByAnnouncementId")
+    public ModelAndView queryDormitoryAnnouncementPageByAnnouncementId(@RequestParam("announcementId") Integer announcementId) {
+        Page<DormitoryAnnouncement> dormitoryAnnouncementPage = dormitoryAnnouncementService.queryDormitoryAnnouncementPageByAnnouncementId(announcementId);
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("dormitoryAnnouncementPage", dormitoryAnnouncementPage);
+        mav.setViewName("showAnnouncement");
+        return mav;
+    }
+    @GetMapping("showDormitoryAnnouncement")
+    public ModelAndView showDormitoryAnnouncement(@RequestParam("pageNum") Integer pageNum) {
+        Page<DormitoryAnnouncement> dormitoryAnnouncementPage = dormitoryAnnouncementService.queryDormitoryAnnouncementPage(pageNum);
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("dormitoryAnnouncementPage", dormitoryAnnouncementPage);
+        mav.setViewName("showAnnouncement");
+        return mav;
+    }
+    @GetMapping("/queryDormitoryAnnouncementById")
+    @ResponseBody
+    public Message queryDormitoryAnnouncementById(@RequestParam("announcementId") Integer announcementId) {
+        DormitoryAnnouncement dormitoryAnnouncement = dormitoryAnnouncementService.queryDormitoryAnnouncementById(announcementId);
+        if (dormitoryAnnouncement != null) {
+            HashMap<Object, Object> map = new HashMap<>();
+            map.put("dormitoryAnnouncement", dormitoryAnnouncement);
+            return Message.success("成功", map);
+        } else {
+            return Message.fail("未查询到宿舍公告", null);
+        }
+    }
+    @GetMapping("/changeAnnouncement")
+    public String changeAnnouncement(DormitoryAnnouncement dormitoryAnnouncement, HttpSession session) {
+        Administrator administrator = (Administrator) session.getAttribute("administrator");
+        dormitoryAnnouncement.setPublisher(administrator.getAdministratorName());
+        Date now = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String releaseDate = sdf.format(now);
+        dormitoryAnnouncement.setReleaseDate(releaseDate);
+        dormitoryAnnouncementService.changeAnnouncement(dormitoryAnnouncement);
+        return "redirect:/dormitoryAnnouncement";
     }
 }
