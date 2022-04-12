@@ -9,7 +9,6 @@ com\wgx\dormitorymanager2\bean\Major.class
 com\wgx\dormitorymanager2\controller\RepairInfoController.class
 com\wgx\dormitorymanager2\bean\Academy.class
 com\wgx\dormitorymanager2\controller\DormitoryInfoController.class
-com\wgx\dormitorymanager2\handler\ControllerExceptionHandler.class
 com\wgx\dormitorymanager2\interceptor\LoginInterceptor.class
 com\wgx\dormitorymanager2\controller\StudentController.class
 com\wgx\dormitorymanager2\mapper\ClassInfoMapper.class
