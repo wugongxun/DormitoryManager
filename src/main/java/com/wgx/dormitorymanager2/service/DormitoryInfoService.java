@@ -44,14 +44,18 @@ public class DormitoryInfoService {
         String dormitoryPhotoName = prefix + suffix;
         //将数据库中的对应宿舍的dormitoryPhotoName修改为上传后的名字
         DormitoryInfo dormitoryInfo = dormitoryInfoMapper.selectById(dormitoryId);
+        String oldPhotoName = dormitoryInfo.getPhotoName();
         dormitoryInfo.setPhotoName(dormitoryPhotoName);
         dormitoryInfoMapper.updateById(dormitoryInfo);
         File file = new File(uploadFolder);
         if(!file.exists()){
             file.mkdir();
         }
+        //删除旧图片
+        File originalFile = new File(uploadFolder + File.separator + oldPhotoName);
+        originalFile.delete();
+        System.out.println(originalFile);
         String finalPath = uploadFolder + File.separator + dormitoryPhotoName;
-        System.out.println(finalPath);
         photo.transferTo(new File(finalPath));
         return Message.success("上传成功", null);
     }
