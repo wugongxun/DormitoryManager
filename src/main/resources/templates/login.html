@@ -10,6 +10,12 @@
   <link rel="canonical" href="https://getbootstrap.com/docs/3.4/examples/signin/">
 
   <title>登录</title>
+  <!-- axios -->
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+  <!-- (Vue)开发环境版本，包含了有帮助的命令行警告 -->
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+
   <!-- jQuery (Bootstrap 的所有 JavaScript 插件都依赖 jQuery，所以必须放在前边) -->
   <script src="https://fastly.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>
 
@@ -32,7 +38,7 @@
   <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
   <![endif]-->
 
-  <script type="text/javascript">
+  <!-- <script type="text/javascript">
     $(function () {
       //点击管理员登录或者学生登录按钮，为点击的按钮添加active，并将loginType设置为相应的属性值
       $("#adminButton").click(function () {
@@ -75,39 +81,44 @@
         });
       });
     });
-  </script>
-
+  </script> -->
 </head>
 
 <body>
 
-  <div class="container">
+  <div class="container" id="main">
 
-    <form class="form-signin" id="loginForm">
+    <form class="form-signin">
       <h2 class="form-signin-heading text-center">学生宿舍管理系统</h2>
 
       <div class="row">
         <div class="col-md-12">
-          <input type="button" id="adminButton" class="btn btn-primary btn-lg btn-block" value="管理员">
+          <input type="button" class="btn btn-primary btn-lg btn-block" :class="{active:adminActive}" value="管理员" @click="clickLoginTypeButton('admin')">
         </div>
       </div>
       <div class="row" style="margin-top: 10px;margin-bottom: 10px">
         <div class="col-md-12">
-          <input type="button" id="studentButton" class="btn btn-primary btn-lg btn-block" value="学生">
+          <input type="button" class="btn btn-primary btn-lg btn-block" :class="{active:studentActive}" value="学生" @click="clickLoginTypeButton('student')">
         </div>
       </div>
 
       <label for="inputAccount" class="sr-only">Account</label>
-      <input type="text" id="inputAccount" class="form-control" placeholder="学号/管理员用户名" name="account" required autofocus>
+      <input type="text" id="inputAccount" class="form-control" placeholder="学号/管理员用户名" v-model="account" required autofocus>
       <label for="inputPassword" class="sr-only">Password</label>
-      <input type="password" id="inputPassword" class="form-control" placeholder="密码" name="password" required>
+      <input type="password" id="inputPassword" class="form-control" placeholder="密码" v-model="password" required>
 
       <!--loginType确定登录方式[管理员/学生]-->
-      <input type="hidden" id="loginType" name="loginType" value="student">
+      <!-- <input type="hidden" id="loginType" name="loginType" value="student"> -->
       <!--错误信息-->
-      <div id="errorAlertDiv"></div>
+      <div v-if="hasError">
+        <div class="alert alert-danger" role="alert">
+          <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+          <span class="sr-only">Error:</span>
+          <span>{{ errorMessage }}</span>
+        </div>
+      </div>
 
-      <button class="btn btn-lg btn-success btn-block" type="button" id="login">登录</button>
+      <button class="btn btn-lg btn-success btn-block" type="button" @click="login">登录</button>
     </form>
 
   </div> <!-- /container -->
@@ -115,5 +126,61 @@
 
   <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
   <script src="https://fastly.jsdelivr.net/npm/@bootcss/v3.bootcss.com@1.0.35/assets/js/ie10-viewport-bug-workaround.js"></script>
+    
+  <!-- Vue重写 -->
+  <script>
+    var mian = new Vue({
+      el: '#main',
+      data: {
+        // 学生登录按钮和管理员按钮的激活状态，默认为学生登录
+        studentActive:true,
+        adminActive:false,
+        loginType:"student",
+        // 登录账号和密码
+        account:"",
+        password:"",
+        // 错误信息
+        hasError:false,
+        errorMessage:""
+      },
+      methods: {
+        clickLoginTypeButton:function(button) {
+          // 点击学生登录，修改学生登录按钮和管理员按钮的激活状态，并修改loginType
+          if (button == "student") {
+            this.studentActive = true;
+            this.adminActive = false;
+            this.loginType = "student";
+          } else if (button == "admin") {
+            this.studentActive = false;
+            this.adminActive = true;
+            this.loginType = "administrator";
+          }
+        },
+        login:function() {
+          var that = this;
+          // 校验
+          if (this.account == "" || this.password == "") {
+            that.hasError = true;
+            this.errorMessage = "账号密码不能为空";
+            return;
+          }
+          // 登录
+          var data = new URLSearchParams();
+          data.append("account", this.account);
+          data.append("password", this.password);
+          data.append("loginType", this.loginType);
+          axios.post("/login", data).then(function(response) {
+            if (response.data.statusCode == 100) {
+              // 登录成功跳转页面
+              window.location.href = "/";
+            } else {
+              that.hasError = true;
+              that.errorMessage = response.data.message;
+            }
+          });
+        }
+      }
+    })
+  </script>
 </body>
 </html>
