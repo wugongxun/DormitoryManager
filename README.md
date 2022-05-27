@@ -6,6 +6,7 @@
   3. JavaScript
   4. JQuery
   5. BootStrap
+  6. Vue
 - 后端
   1. SpringBoot
   2. MyBatis
