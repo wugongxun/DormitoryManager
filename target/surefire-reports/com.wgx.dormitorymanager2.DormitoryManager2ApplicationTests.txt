@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.wgx.dormitorymanager2.DormitoryManager2ApplicationTests
--------------------------------------------------------------------------------
-Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 7.874 s - in com.wgx.dormitorymanager2.DormitoryManager2ApplicationTests

@@ -198,7 +198,7 @@
                                 <h3 class="text-center">所在宿舍:<span th:text="${dormitoryInfo.buildingId}">219</span>#<span th:text="${dormitoryInfo.floorId}">204</span></h3>
                                 <th:block th:if="${dormitoryInfo.photoName != null}">
                                     <!--部署到服务器前需要把图片路径修改为/home/wgx/dormitoryPhoto/-->
-                                    <img src="../static/dormitoryPhoto/219-204.jpg" th:src="@{'/home/wgx/dormitoryPhoto/' + ${dormitoryInfo.photoName}}">
+                                    <img src="../static/dormitoryPhoto/219-204.jpg" th:src="@{'/static/dormitoryPhoto/' + ${dormitoryInfo.photoName}}">
                                 </th:block>
                                 <th:block th:if="${dormitoryInfo.photoName == null}">
                                     <h5 class="text-center">暂无宿舍照片</h5>
@@ -221,6 +221,8 @@
 
             </div>
         </div>
+
+        <div th:insert="~{footer.html}"></div>
     </div>
 
 <!-- Bootstrap core JavaScript
